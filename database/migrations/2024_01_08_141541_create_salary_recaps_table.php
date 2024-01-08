@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('salary_recaps', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id')->nullable(false);
-            $table->string("recap_month")->nullable(false);
+            $table->string('user_id')->nullable(true);;
+            $table->string("recap_month");
             $table->integer("work_day");
             $table->integer("late_day");
             $table->bigInteger("salary_amount");

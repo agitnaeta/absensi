@@ -26,10 +26,10 @@ class PresenceRequest extends FormRequest
     {
         return [
             'user_id' => 'required|string',
-            'in' => 'required|date_time',
-            'out' => 'required|date_time',
-            'overtime_in' => 'required|date_time',
-            'overtime_out' => 'required|date_time',
+            'in' => 'required',
+            'out' => 'required',
+            'overtime_in' => 'required',
+            'overtime_out' => 'required',
             'is_overtime' => 'required|boolean',
             'no_record' => 'required|boolean',
         ];

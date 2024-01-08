@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\PresenceRequest;
+use App\Models\Presence;
+use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Prologue\Alerts\Facades\Alert;
 
 /**
  * Class PresenceCrudController
@@ -15,13 +18,23 @@ class PresenceCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation {store as storeTrait;}
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
+    protected $entityField = [
+        'name'=>'user_id',
+        'entity'=>'user',
+        'model'=>User::class,
+        'attribute'=>'name',
+        'type'=>'select',
+        'label'=>'Nama Karyawan'
+    ];
+
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
-     * 
+     *
      * @return void
      */
     public function setup()
@@ -29,11 +42,19 @@ class PresenceCrudController extends CrudController
         CRUD::setModel(\App\Models\Presence::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/presence');
         CRUD::setEntityNameStrings('presence', 'presences');
+        $this->crud->addClause('with','user');
+    }
+
+
+    protected function setupShowOperation()
+    {
+        $this->autoSetupShowOperation();
+        $this->crud->addColumn($this->entityField)->beforeColumn('in');
     }
 
     /**
      * Define what happens when the List operation is loaded.
-     * 
+     *
      * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
      * @return void
      */
@@ -45,11 +66,14 @@ class PresenceCrudController extends CrudController
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
+
+        $this->crud->removeColumn('user_id');
+        $this->crud->addColumn($this->entityField)->beforeColumn('in');
     }
 
     /**
      * Define what happens when the Create operation is loaded.
-     * 
+     *
      * @see https://backpackforlaravel.com/docs/crud-operation-create
      * @return void
      */
@@ -62,16 +86,53 @@ class PresenceCrudController extends CrudController
          * Fields can be defined using the fluent syntax:
          * - CRUD::field('price')->type('number');
          */
+
+        $this->crud->field($this->entityField);
     }
 
     /**
      * Define what happens when the Update operation is loaded.
-     * 
+     *
      * @see https://backpackforlaravel.com/docs/crud-operation-update
      * @return void
      */
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+
+    public function store()
+    {
+
+        $request = $this->crud->validateRequest();
+        $presense  = new Presence();
+        $presense->user_id = $request->user_id;
+        $presense->in = $request->in;
+        $presense->out = $request->out;
+        $presense->overtime_in = $request->overtime_in;
+        $presense->overtime_out = $request->overtime_out;
+        $presense->is_overtime = $request->is_overtime;
+        $presense->no_record = $request->no_record;
+
+        $presense->save();
+        Alert::add('success', 'Berhasil input data')->flash();
+        return redirect(route('presence.index'));
+    }
+
+    public function update()
+    {
+        $request = $this->crud->validateRequest();
+        $presense  = new Presence();
+        $presense->user_id = $request->user_id;
+        $presense->in = $request->in;
+        $presense->out = $request->out;
+        $presense->overtime_in = $request->overtime_in;
+        $presense->overtime_out = $request->overtime_out;
+        $presense->is_overtime = $request->is_overtime;
+        $presense->no_record = $request->no_record;
+
+        $presense->save();
+        Alert::add('success', 'Berhasil update data')->flash();
+        return redirect(route('presence.index'));
     }
 }

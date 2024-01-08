@@ -13,4 +13,8 @@ class Salary extends Model
     protected $fillable = [
         'user_id', 'amount', 'overtime_amount', 'overtime_type',
     ];
+
+    public function user(){
+        return $this->hasOne(User::class,'id','user_id');
+    }
 }

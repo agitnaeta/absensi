@@ -11,6 +11,18 @@ class Presence extends Model
     use CrudTrait;
     use HasFactory;
     protected $fillable = [
-        'user_id', 'in', 'out', 'overtime_in', 'overtime_out', 'is_overtime', 'no_record',
+        'in',
+        'out',
+        'user_id',
+        'overtime_in',
+        'overtime_out',
+        'is_overtime',
+        'no_record',
     ];
+
+    protected $guarded =[];
+
+    public function user(){
+        return $this->hasOne(User::class,'id','user_id');
+    }
 }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('presences', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id')->nullable(false);
+            $table->string('user_id')->nullable(true);
             $table->dateTime('in');
             $table->dateTime('out');
             $table->dateTime('overtime_in');

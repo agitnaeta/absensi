@@ -51,4 +51,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Schedule::class);
     }
+
+    public function presense(){
+        return $this->hasMany(Presence::class,'id','user_id');
+    }
 }
+
