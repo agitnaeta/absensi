@@ -31,7 +31,6 @@ class PresenceRequest extends FormRequest
             'overtime_in' => 'required',
             'overtime_out' => 'required',
             'is_overtime' => 'required|boolean',
-            'no_record' => 'required|boolean',
         ];
     }
 

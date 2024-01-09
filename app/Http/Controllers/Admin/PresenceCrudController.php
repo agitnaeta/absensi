@@ -7,6 +7,7 @@ use App\Models\Presence;
 use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Backpack\CRUD\app\Library\Widget;
 use Prologue\Alerts\Facades\Alert;
 
 /**
@@ -112,7 +113,6 @@ class PresenceCrudController extends CrudController
         $presense->overtime_in = $request->overtime_in;
         $presense->overtime_out = $request->overtime_out;
         $presense->is_overtime = $request->is_overtime;
-        $presense->no_record = $request->no_record;
 
         $presense->save();
         Alert::add('success', 'Berhasil input data')->flash();
@@ -129,10 +129,14 @@ class PresenceCrudController extends CrudController
         $presense->overtime_in = $request->overtime_in;
         $presense->overtime_out = $request->overtime_out;
         $presense->is_overtime = $request->is_overtime;
-        $presense->no_record = $request->no_record;
 
         $presense->save();
         Alert::add('success', 'Berhasil update data')->flash();
         return redirect(route('presence.index'));
+    }
+
+    public function scan(){
+        Widget::add()->type('script')->content('https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/index.min.js');
+        return view('presence.scan');
     }
 }

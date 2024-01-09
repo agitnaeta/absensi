@@ -7,8 +7,12 @@
 
 <x-backpack::menu-item title="Users" icon="la la-user" :link="backpack_url('user')" />
 <x-backpack::menu-dropdown title="Absen" icon="la la-calendar">
+    <x-backpack::menu-dropdown-item title="Scan" icon="la la-calendar" :link="route('presence.scan')" />
     <x-backpack::menu-dropdown-item title="Schedules" icon="la la-calendar" :link="backpack_url('schedule')" />
     <x-backpack::menu-dropdown-item title="Presences" icon="la la-calendar-check" :link="backpack_url('presence')" />
+    <x-backpack::menu-dropdown-item title="Schedule day offs" icon="la la-moon" :link="backpack_url('schedule-day-off')" />
+    <x-backpack::menu-dropdown-item title="Days" icon="la la-sun" :link="backpack_url('day')" />
+
 </x-backpack::menu-dropdown>
 
 <x-backpack::menu-dropdown title="Kasbon" icon="la la-money-bill">

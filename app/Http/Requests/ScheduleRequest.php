@@ -26,13 +26,13 @@ class ScheduleRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'in' => 'required|date_format:H:i',
-            'out' => 'required|date_format:H:i',
-            'over_in' => 'required|date_format:H:i',
-            'over_out' => 'required|date_format:H:i',
+            'in' => 'required',
+            'out' => 'required',
+            'over_in' => 'required',
+            'over_out' => 'required',
             'off_day_per_month' => 'required|integer',
             'fine_per_minute' => 'required|integer',
-            'day_off' => 'required|in:sunday,monday,tuesday,wednesday,thursday,friday,saturday',
+            'day_off' => 'required',
         ];
     }
 

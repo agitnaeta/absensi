@@ -182,7 +182,7 @@ class UserCrudController extends CrudController
     public function print($id){
         $user = User::find($id);
         $pdf =  Pdf::loadView('user.detail',compact('user'))
-        ->setPaper(100,'p');
+        ->setPaper([0,0,220,300],'p');
         return $pdf->stream("sample.pdf");
     }
 }

@@ -18,7 +18,6 @@ class Schedule extends Model
         'over_out',
         'off_day_per_month',
         'fine_per_minute',
-        'day_off'
     ];
 
     public function user()

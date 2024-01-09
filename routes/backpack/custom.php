@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\PresenceCrudController;
 use App\Http\Controllers\Admin\UserCrudController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,11 @@ Route::group([
     Route::group(['prefix'=>'user'],function (){
         Route::get("/{id}/print",[UserCrudController::class,'print'])->name('user.print');
     });
+    Route::group(['prefix'=>'presence'],function (){
+        Route::get("/scan",[PresenceCrudController::class,'scan'])->name('presence.scan');
+    });
 
 
+    Route::crud('day', 'DayCrudController');
+    Route::crud('schedule-day-off', 'ScheduleDayOffCrudController');
 }); // this should be the absolute last line of this file

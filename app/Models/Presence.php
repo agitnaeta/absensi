@@ -17,7 +17,6 @@ class Presence extends Model
         'overtime_in',
         'overtime_out',
         'is_overtime',
-        'no_record',
     ];
 
     protected $guarded =[];
