@@ -106,7 +106,7 @@ class ScheduleCrudController extends CrudController
 
     public function store() {
         $request = $this->crud->validateRequest();
-        $dayOffs = collect(json_decode($request->get('day_off')));
+        $dayOffs = collect($request->get('day_off'));
 
         $schedule = Schedule::create($request->all());
         $dayOffs->map(function ($off) use($schedule){

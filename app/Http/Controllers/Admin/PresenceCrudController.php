@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\PresenceRequest;
 use App\Models\Presence;
 use App\Models\User;
+use App\Services\PresenceService;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
-use Backpack\CRUD\app\Library\Widget;
+use Illuminate\Http\Request;
 use Prologue\Alerts\Facades\Alert;
 
 /**
@@ -44,6 +45,7 @@ class PresenceCrudController extends CrudController
         CRUD::setRoute(config('backpack.base.route_prefix') . '/presence');
         CRUD::setEntityNameStrings('presence', 'presences');
         $this->crud->addClause('with','user');
+
     }
 
 
@@ -136,7 +138,16 @@ class PresenceCrudController extends CrudController
     }
 
     public function scan(){
-        Widget::add()->type('script')->content('https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/index.min.js');
         return view('presence.scan');
+    }
+
+    public function record(Request $request){
+        if($request->qr){
+            $user = User::with('schedule')
+                ->where("qr",$request->qr)->first();
+            $p = (new PresenceService())->record($user);
+            return response()->json($p);
+        }
+        return response()->json("Not Found",404);
     }
 }

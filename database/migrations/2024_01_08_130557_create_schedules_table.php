@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
             $table->string("name")->nullable(false);
-            $table->time('in',1)->default(0);
-            $table->time('out',1)->default(0);
-            $table->time('over_in',1)->default(0);
-            $table->time('over_out',1)->default(0);
+            $table->time('in')->default(0);
+            $table->time('out')->default(0);
+            $table->time('over_in')->default(0);
+            $table->time('over_out')->default(0);
             $table->integer('off_day_per_month')->default(0);
             $table->bigInteger('fine_per_minute')->default(0);
             $table->enum('day_off',["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"])
