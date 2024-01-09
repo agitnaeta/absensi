@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserCrudController;
 use Illuminate\Support\Facades\Route;
 
 // --------------------------
@@ -23,4 +24,10 @@ Route::group([
     Route::crud('loan-payment', 'LoanPaymentCrudController');
     Route::crud('presence', 'PresenceCrudController');
     Route::crud('salary-recap', 'SalaryRecapCrudController');
+
+    Route::group(['prefix'=>'user'],function (){
+        Route::get("/{id}/print",[UserCrudController::class,'print'])->name('user.print');
+    });
+
+
 }); // this should be the absolute last line of this file

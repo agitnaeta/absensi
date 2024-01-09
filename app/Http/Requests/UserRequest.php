@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UserRequest extends FormRequest
 {
@@ -25,7 +26,23 @@ class UserRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'name' => 'required|min:5|max:255'
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string',
+            'schedule_id' => 'nullable|integer', // Assuming schedule_id is an integer field
+        ];
+    }
+    public function updateRules($userId)
+    {
+        return [
+            'name' => 'required|string',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users', 'email')->ignore($userId), // Assuming $userId is the ID of the current user
+            ],
+            'password' => 'string|nullable',
+            'schedule_id' => 'nullable|integer',
         ];
     }
 
@@ -49,7 +66,18 @@ class UserRequest extends FormRequest
     public function messages()
     {
         return [
-            //
+            'name.required' => 'Kolom nama harus diisi.',
+            'name.string' => 'Kolom nama harus berupa teks.',
+
+            'email.required' => 'Kolom email harus diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan oleh pengguna lain.',
+
+            'password.required' => 'Kolom password harus diisi.',
+            'password.string' => 'Kolom password harus berupa teks.',
+
+            'schedule_id.integer' => 'Kolom schedule_id harus berupa angka.',
         ];
+
     }
 }
