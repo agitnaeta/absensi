@@ -101,6 +101,7 @@ class UserCrudController extends CrudController
 
     }
 
+
     /**
      * Define what happens when the Create operation is loaded.
      *
@@ -112,7 +113,7 @@ class UserCrudController extends CrudController
         CRUD::setValidation(UserRequest::class);
         CRUD::setFromDb(); // set fields from db columns.
         CRUD::field([
-            'Label'=> "Jadwal",
+            'label'=> "Jadwal",
             'name'=>'schedule_id',
             'type'=>'select',
             'model'     => Schedule::class,

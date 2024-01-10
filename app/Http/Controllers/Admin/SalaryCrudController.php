@@ -113,7 +113,29 @@ class SalaryCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
-        $this->setupCreateOperation();
+        $id = $this->crud->getCurrentEntryId();
+        CRUD::setValidation((new SalaryRequest())->rulesUpdate($id));
+        CRUD::setFromDb(); // set fields from db columns.
+
+        /**
+         * Fields can be defined using the fluent syntax:
+         * - CRUD::field('price')->type('number');
+         */
+        $this->crud->field($this->entityField)->beforeColumn('amount');
+
+        $this->crud->field('amount')->prefix('Rp');
+        $this->crud->field('overtime_amount')->prefix('Rp');
+        $this->crud->field(
+            [
+                'name'        => 'overtime_type',
+                'label'       => 'Jenis Lembur',
+                'type'        => 'radio',
+                'options'     => [
+                    'hour' => 'Per-Jam',
+                    'flat' => 'Flat'
+                ]
+            ]
+        );
     }
     public function store()
     {
@@ -134,7 +156,7 @@ class SalaryCrudController extends CrudController
     public function update()
     {
         $request = $this->crud->validateRequest();
-        $salary  = new Salary();
+        $salary = Salary::find($this->crud->getCurrentEntryId());
         $salary->user_id = $request->user_id;
         $salary->amount = $request->amount;
         $salary->overtime_amount = $request->overtime_amount;

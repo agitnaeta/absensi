@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\LoanRequest;
 use App\Models\Loan;
 use App\Models\User;
+use App\Repositories\LoanRepository;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Prologue\Alerts\Facades\Alert;
@@ -81,6 +82,7 @@ class LoanCrudController extends CrudController
          * Fields can be defined using the fluent syntax:
          * - CRUD::field('price')->type('number');
          */
+        $this->crud->field('amount')->prefix('Rp.');
         $this->crud->field($this->entityField);
     }
 
@@ -121,4 +123,20 @@ class LoanCrudController extends CrudController
         Alert::add('success', 'Berhasil update data')->flash();
         return redirect(route('loan.index'));
     }
+
+    public function loanRecap(){
+        $loans = LoanRepository::recap();
+        return view('loan.recap',compact('loans'));
+    }
+
+    public function detail($id){
+        $user = User::find($id);
+        if(!$user){
+            Alert::error("User tidak ditemukan")->flash();
+            return redirect(route('loan.recap'));
+        }
+        $loan  = LoanRepository::detail($user);
+        return view('loan.detail',compact('loan','user'));
+    }
+
 }

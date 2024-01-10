@@ -47,7 +47,6 @@ class PresenceService
                 $presence->overtime_out = Carbon::now()->format('Y-m-d H:i:s');
             }
             $presence->is_overtime = 1;
-            $presence->is_overtime = 1;
         }
         $presence->save();
         return $presence;

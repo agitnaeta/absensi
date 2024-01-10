@@ -6,8 +6,10 @@ use App\Http\Requests\ScheduleRequest;
 use App\Models\Day;
 use App\Models\Schedule;
 use App\Models\ScheduleDayOff;
+use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Illuminate\Http\Request;
 use Prologue\Alerts\Facades\Alert;
 
 /**
@@ -132,6 +134,30 @@ class ScheduleCrudController extends CrudController
 
         Alert::success("Berhasil update data")->flash();
         return redirect(route('schedule.index'));
+    }
+
+
+    public function viewSchedule(){
+        $users = User::all();
+        $schedules = Schedule::all();
+        return view('schedule.set',compact('users','schedules'));
+    }
+
+    public function massUpdateSchedule(Request $request){
+        $userIds = $request->get('user_ids');
+        $schedules = $request->get('schedule_ids');
+
+
+        for ($i = 0; $i < count($userIds); $i++) {
+            $user  = User::find($userIds[$i]);
+            if($user){
+                Alert::success("Berhasil Update data $i")->flash();
+                $user->schedule_id = $schedules[$i];
+                $user->save();
+            }
+        }
+
+        return redirect(route('schedule.view.update'));
     }
 
 }

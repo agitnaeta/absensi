@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class SalaryRequest extends FormRequest
 {
@@ -25,12 +26,31 @@ class SalaryRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|string',
+            'user_id' => [
+                'required',
+                'string',
+                'unique:salaries,user_id'
+            ],
             'amount' => 'required|integer',
             'overtime_amount' => 'required|integer',
             'overtime_type' => 'required|in:flat,hour',
         ];
     }
+    public function rulesUpdate($userId): array
+    {
+        return [
+            'user_id' => [
+                'required',
+                'string',
+                Rule::unique('salaries','user_id')->ignore($userId)
+            ],
+            'amount' => 'required|integer',
+            'overtime_amount' => 'required|integer',
+            'overtime_type' => 'required|in:flat,hour',
+        ];
+    }
+
+
 
     /**
      * Get the validation attributes that apply to the request.
@@ -54,6 +74,7 @@ class SalaryRequest extends FormRequest
         return [
             'user_id.required' => 'Kolom user ID harus diisi.',
             'user_id.string' => 'Kolom user ID harus berupa teks.',
+            'user_id.unique' => 'Kolom user Sudah pernah diset silahkan ubah di menu edit.',
             'amount.required' => 'Kolom amount harus diisi.',
             'amount.integer' => 'Kolom amount harus berupa bilangan bulat.',
             'overtime_amount.required' => 'Kolom overtime amount harus diisi.',

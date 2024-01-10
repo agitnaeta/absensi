@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\LoanCrudController;
 use App\Http\Controllers\Admin\PresenceCrudController;
+use App\Http\Controllers\Admin\ScheduleCrudController;
 use App\Http\Controllers\Admin\UserCrudController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +34,15 @@ Route::group([
     Route::group(['prefix'=>'presence'],function (){
         Route::get("/scan",[PresenceCrudController::class,'scan'])->name('presence.scan');
         Route::post("/record",[PresenceCrudController::class,'record'])->name('presence.record');
+    });
+
+    Route::group(['prefix'=>'schedule'],function (){
+        Route::get("/view-update",[ScheduleCrudController::class,'viewSchedule'])->name('schedule.view.update');
+        Route::post("/mass-update",[ScheduleCrudController::class,'massUpdateSchedule'])->name('schedule.mass_update');
+    });
+    Route::group(['prefix'=>'loan'],function (){
+        Route::get("/recap",[LoanCrudController::class,'loanRecap'])->name('loan.recap');
+        Route::get("/{id}/detail",[LoanCrudController::class,'detail'])->name('loan.detail');
     });
 
 

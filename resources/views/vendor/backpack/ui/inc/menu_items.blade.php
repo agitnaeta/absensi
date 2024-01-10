@@ -8,16 +8,18 @@
 <x-backpack::menu-item title="Users" icon="la la-user" :link="backpack_url('user')" />
 <x-backpack::menu-dropdown title="Absen" icon="la la-calendar">
     <x-backpack::menu-dropdown-item title="Scan" icon="la la-calendar" :link="route('presence.scan')" />
-    <x-backpack::menu-dropdown-item title="Schedules" icon="la la-calendar" :link="backpack_url('schedule')" />
-    <x-backpack::menu-dropdown-item title="Presences" icon="la la-calendar-check" :link="backpack_url('presence')" />
-    <x-backpack::menu-dropdown-item title="Schedule day offs" icon="la la-moon" :link="backpack_url('schedule-day-off')" />
-    <x-backpack::menu-dropdown-item title="Days" icon="la la-sun" :link="backpack_url('day')" />
+    <x-backpack::menu-dropdown-item title="Jadwal" icon="la la-calendar" :link="backpack_url('schedule')" />
+    <x-backpack::menu-dropdown-item title="Setting Jadwal" icon="la la-calendar" :link="route('schedule.view.update')" />
+    <x-backpack::menu-dropdown-item title="Kehadiran" icon="la la-calendar-check" :link="backpack_url('presence')" />
+{{--    <x-backpack::menu-dropdown-item title="Hari Libur" icon="la la-moon" :link="backpack_url('schedule-day-off')" />--}}
+{{--    <x-backpack::menu-dropdown-item title="Daftar Hari" icon="la la-sun" :link="backpack_url('day')" />--}}
 
 </x-backpack::menu-dropdown>
 
 <x-backpack::menu-dropdown title="Kasbon" icon="la la-money-bill">
-    <x-backpack::menu-dropdown-item title="Loans" icon="la la-money-bill" :link="backpack_url('loan')" />
-    <x-backpack::menu-dropdown-item title="Loan payments" icon="la la-money-bill-alt" :link="backpack_url('loan-payment')" />
+    <x-backpack::menu-dropdown-item title="Rekap" icon="la la-money-bill" :link="route('loan.recap')" />
+    <x-backpack::menu-dropdown-item title="Kasbon" icon="la la-money-bill" :link="backpack_url('loan')" />
+    <x-backpack::menu-dropdown-item title="Pembayaran Kasbon" icon="la la-money-bill-alt" :link="backpack_url('loan-payment')" />
 </x-backpack::menu-dropdown>
 
 <x-backpack::menu-dropdown title="Gajian" icon="la la-money-check-alt">

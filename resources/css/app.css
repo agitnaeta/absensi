@@ -1,0 +1,7 @@
+.text-right{
+    text-align: right;
+}
+.pull-right{
+    justify-content: right;
+    text-align: left;
+}
