@@ -23,6 +23,6 @@
 </x-backpack::menu-dropdown>
 
 <x-backpack::menu-dropdown title="Gajian" icon="la la-money-check-alt">
-    <x-backpack::menu-dropdown-item title="Salaries" icon="la la-money-check" :link="backpack_url('salary')" />
-    <x-backpack::menu-dropdown-item title="Salary recaps" icon="la la-money-check" :link="backpack_url('salary-recap')" />
+    <x-backpack::menu-dropdown-item title="Gaji" icon="la la-money-check" :link="backpack_url('salary')" />
+    <x-backpack::menu-dropdown-item title="Rekap Gaji" icon="la la-money-check" :link="backpack_url('salary-recap')" />
 </x-backpack::menu-dropdown>
