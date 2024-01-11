@@ -5,26 +5,32 @@ namespace App\Services;
 use App\Models\Presence;
 use App\Models\ScheduleDayOff;
 use App\Models\User;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class PresenceService
 {
-
-    public function __construct(){}
-
+    const TIME_ZONE = 'Asia/Jakarta';
     public function record(User $user){
-
-        $now = Carbon::now();
-
-        $isOffDay = $this->checkIfOffDay($user,$now);
-        if($isOffDay){
-            return $this->recordOnOffDay($user,$now);
-        }
-        return $this->recordOnOffDay($user,$now);
+        $time = Carbon::now(self::TIME_ZONE);
+        return $this->writeRecord($user,$time);
     }
 
-    public function checkIfOffDay(User $user,Carbon $now){
+    public function writeRecord(User $user, Carbon $time): Presence
+    {
+        $presence = Presence::where('user_id',$user->id)
+                            ->whereDate('created_at',Carbon::today(self::TIME_ZONE))
+                            ->first();
+        if(!$presence){
+            return $this->login($user, $time);
+        }else{
+            return $this->logout($presence,$time);
+        }
+    }
+
+    public function checkIfOffDay(User $user,Carbon $now): int
+    {
         $dayOffs = ScheduleDayOff::with('days')
             ->where('schedule_id',$user->schedule->id)
             ->get();
@@ -37,71 +43,72 @@ class PresenceService
                 $days->push($dayOff);
             }
         });
-        return $days->count();
+        return $days->count() > 0;
     }
-
-    public function recordOnOffDay(User $user,Carbon $now){
-        $presence = Presence::where('user_id',$user->id)
-            ->whereDate('created_at',Carbon::today())
-            ->first();
-        if(!$presence){
-            return $this->overtimeLogin($user,$now);
-        }
-        // jika sudah pernah
-        $presence->overtime_out = $now->format('Y-m-d H:i:s');
+    public function login(User $user, Carbon $now): Presence
+    {
+       $presence = new Presence();
+       $presence->user_id = $user->id;
+       $presence->in = $now->format('Y-m-d H:i:s');
+       $presence->save();
+       return $presence;
+    }
+    public function logout(Presence $presence, Carbon $now): Presence
+    {
+        $presence->out = $now->format('Y-m-d H:i:s');
         $presence->save();
         return $presence;
-
     }
-    public function recordOnDaily(User $user, Carbon $now){
-        $presence = Presence::where('user_id',$user->id)
-            ->whereDate('created_at',Carbon::today())
-            ->first();
 
-        // shift hour
-        $in = Carbon::createFromFormat("H:i:s.u",$user->schedule->in);
-        $oIn = Carbon::createFromFormat("H:i:s.u",$user->schedule->over_in);
+    public function calculateLate(Presence $presence){
+        $user = User::with('schedule')
+                    ->where('id',$presence->user_id)
+                    ->first();
 
-        if(!$presence){
-            return $this->login(new Presence(),$user);
-        }
+        if($presence->in !== null){
+            // catatan waktu masuk
+            $timeIn = Carbon::createFromFormat("H:i:s.u",$user->schedule->in,self::TIME_ZONE);
 
-        // schema Logout
-        if($presence && $now->greaterThan($in)){
-            $presence->out = Carbon::now()->format('Y-m-d H:i:s');
-        }
+            // Absen masuk
+            $presenceIn = Carbon::parse($presence->in,self::TIME_ZONE);
 
-        // Overtime Record
-        if($presence && $now->greaterThan($oIn)){
-            if($presence->overtime_in == null){
-                $presence->overtime_in = Carbon::now()->format('Y-m-d H:i:s');
-            }else{
-                $presence->overtime_out = Carbon::now()->format('Y-m-d H:i:s');
+            // tanggal & jadwal masuk
+            $scheduleIn = $presenceIn->copy()->setTimeFrom($timeIn);
+
+            if($scheduleIn->lessThan($presenceIn)){
+                $presence->is_late = true;
+                $presence->late_minute = $scheduleIn->diffInMinutes($presenceIn);
+                $presence->saveQuietly();
             }
-            $presence->is_overtime = 1;
         }
-        $presence->save();
-        return $presence;
     }
 
-    public function login(Presence $p, User $user, Carbon $now){
-        $in = Carbon::createFromFormat("H:i:s.u",$user->schedule->in);
-        $p->user_id = $user->id;
-        $p->in = $now->format('Y-m-d H:i:s');
-        if($now->greaterThan($in)){
-            $p->is_late = true;
-            $p->late_minute = $now->diffInMinutes($in);
-        }
-        $p->save();
-        return $p;
-    }
+    public function calculateOvertime(Presence $presence){
+        $user = User::with('schedule')
+                    ->where('id',$presence->user_id)
+                    ->first();
 
-    public function overtimeLogin(User $user, Carbon $now){
-        $p = new Presence();
-        $p->user_id = $user->id;
-        $p->is_overtime = true;
-        $p->overtime_in = $now->format('Y-m-d H:i:s');
-        $p->save();
-        return $p;
+        $presenceIn = Carbon::parse($presence->in,self::TIME_ZONE);
+        if ($this->checkIfOffDay($user, $presenceIn)){
+            $presence->is_overtime = true;
+            return $presence->saveQuietly();
+        }
+
+        if($presence->out !== null){
+            // jadwal waktu keluar
+            $overtimeIn = Carbon::createFromFormat("H:i:s.u",$user->schedule->over_in,self::TIME_ZONE);
+
+            // Absen keluar
+            $presenceOut = Carbon::parse($presence->out,self::TIME_ZONE);
+
+            // tanggal & jadwal masuk
+            $scheduleOverIn = $presenceOut->copy()->setTimeFrom($overtimeIn);
+
+            if($presenceOut->greaterThan($scheduleOverIn)){
+                $presence->is_overtime = true;
+                return $presence->saveQuietly();
+
+            }
+        }
     }
 }

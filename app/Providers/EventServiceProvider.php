@@ -3,13 +3,14 @@
 namespace App\Providers;
 
 use App\Models\Presence;
+use App\Models\SalaryRecap;
 use App\Models\User;
 use App\Observers\PresenceObserver;
+use App\Observers\SalaryRecapObserver;
 use App\Observers\UserObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -31,6 +32,7 @@ class EventServiceProvider extends ServiceProvider
     {
         User::observe(UserObserver::class);
         Presence::observe(PresenceObserver::class);
+        SalaryRecap::observe(SalaryRecapObserver::class);
     }
 
     /**
