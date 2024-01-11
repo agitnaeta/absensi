@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\SalaryRecapRequest;
+use App\Models\Schedule;
+use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -19,9 +21,19 @@ class SalaryRecapCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
+    protected $entityField = [
+        'name'=>'user_id',
+        'entity'=>'user',
+        'model'=>User::class,
+        'attribute'=>'name',
+        'type'=>'select',
+        'label'=>'Nama Karyawan'
+    ];
+
+
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
-     * 
+     *
      * @return void
      */
     public function setup()
@@ -29,11 +41,20 @@ class SalaryRecapCrudController extends CrudController
         CRUD::setModel(\App\Models\SalaryRecap::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/salary-recap');
         CRUD::setEntityNameStrings('salary recap', 'salary recaps');
+        $this->crud->addClause('with','user');
+    }
+    protected function setupShowOperation()
+    {
+        $this->autoSetupShowOperation();
+        $this->crud->column('salary_amount')->prefix('Rp.');
+        $this->crud->column('overtime_amount')->prefix('Rp.');
+        $this->crud->column('received')->prefix('Rp.');
+        $this->crud->addColumn($this->entityField)->makeFirstColumn();
     }
 
     /**
      * Define what happens when the List operation is loaded.
-     * 
+     *
      * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
      * @return void
      */
@@ -45,11 +66,26 @@ class SalaryRecapCrudController extends CrudController
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
+        $this->crud->removeColumn('user_id');
+        $this->crud->removeColumn('work_day');
+        $this->crud->removeColumn('late_day');
+        $this->crud->removeColumn('loan_cut');
+        $this->crud->removeColumn('late_cut');
+        $this->crud->removeColumn('abstain_cut');
+        $this->crud->column('salary_amount')->prefix('Rp.');
+        $this->crud->column('overtime_amount')->prefix('Rp.');
+        $this->crud->column('received')->prefix('Rp.');
+        $this->crud->addColumn($this->entityField)->afterColumn('recap_month');
+        $columns = array_merge([$this->entityField],$this->crud->columns());
+        $this->crud->setColumns($columns);
+        $this->crud->removeButtons(['delete','update']);
+
+
     }
 
     /**
      * Define what happens when the Create operation is loaded.
-     * 
+     *
      * @see https://backpackforlaravel.com/docs/crud-operation-create
      * @return void
      */
@@ -62,11 +98,12 @@ class SalaryRecapCrudController extends CrudController
          * Fields can be defined using the fluent syntax:
          * - CRUD::field('price')->type('number');
          */
+        $this->crud->field($this->entityField);
     }
 
     /**
      * Define what happens when the Update operation is loaded.
-     * 
+     *
      * @see https://backpackforlaravel.com/docs/crud-operation-update
      * @return void
      */

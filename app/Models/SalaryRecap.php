@@ -14,4 +14,8 @@ class SalaryRecap extends Model
         'user_id', 'recap_month', 'work_day', 'late_day', 'salary_amount', 'overtime_amount',
         'loan_cut', 'late_cut', 'abstain_cut', 'received',
     ];
+
+    public function user(){
+        return $this->hasOne(User::class,'id','user_id');
+    }
 }

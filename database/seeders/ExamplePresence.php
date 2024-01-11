@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Presence;
+use App\Models\SalaryRecap;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -15,6 +16,7 @@ class ExamplePresence extends Seeder
     public function run(): void
     {
         Presence::truncate();
+        SalaryRecap::truncate();
         $users = User::with('schedule')->get();
         foreach ($users as $user){
             $dateStart = Carbon::now()->startOfMonth();

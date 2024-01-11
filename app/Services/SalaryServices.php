@@ -7,6 +7,7 @@ use App\Models\Salary;
 use App\Models\SalaryRecap;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use function Symfony\Component\Translation\t;
 
 class SalaryServices
@@ -14,8 +15,11 @@ class SalaryServices
 
     public function recap(Presence $presence){
 
+        $salaryRecap  = $this->getRecords($presence);
         if(!$this->getRecords($presence)){
             $this->createSalaryRecap($presence);
+        }else{
+            $this->calculateSalaryRecap($salaryRecap);
         }
     }
 
@@ -31,7 +35,7 @@ class SalaryServices
         return $recapMonth->format('m-Y');
     }
 
-    protected function createSalaryRecap(Presence $presence){
+    public function createSalaryRecap(Presence $presence){
         $salaryRecap = new SalaryRecap;
         $salaryRecap->user_id = $presence->user_id;
         $salaryRecap->recap_month = $this->recapMonth($presence);
@@ -47,19 +51,26 @@ class SalaryServices
     }
 
     public function calculateSalaryRecap(SalaryRecap $salaryRecap){
-        $time = Carbon::createFromFormat('m-Y',$salaryRecap->recap_mont);
-        $presence = Presence::whereYear('in',$time->format('Y'))
-            ->whereMonth('in',$time->format('Y'))
-        ->get();
+        $time = Carbon::createFromFormat('m-Y',$salaryRecap->recap_month);
+        $presence = Presence::where('user_id',$salaryRecap->user_id)
+            ->whereYear('in',$time->format('Y'))
+            ->whereMonth('in',$time->format('m'))
+            ->get();
+
 
         $salary = Salary::where('user_id',$salaryRecap->user_id)->first();
 
+        if($salary === null){
+            return $salaryRecap;
+        }
+
         $salaryRecap->work_day = $presence->count();
         $salaryRecap->late_day = $presence->sum('is_late');
-        $salaryRecap->amount = $salary->amount;
+        $salaryRecap->salary_amount = $salary->amount;
         $salaryRecap->overtime_amount = $presence->sum('is_overtime') * $salary->overtime_amount;
-        $salaryRecap->received = $salaryRecap->amount + $salaryRecap->overtime_amount - $salaryRecap->loan_cut - $salaryRecap->abstain_cut;
+        $salaryRecap->received = $salaryRecap->salary_amount + $salaryRecap->overtime_amount - $salaryRecap->loan_cut - $salaryRecap->abstain_cut;
         $salaryRecap->saveQuietly();
+
     }
 
 

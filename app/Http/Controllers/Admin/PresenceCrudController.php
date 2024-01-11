@@ -121,7 +121,7 @@ class PresenceCrudController extends CrudController
     public function update()
     {
         $request = $this->crud->validateRequest();
-        $presense  = new Presence();
+        $presense  = $this->crud->getCurrentEntry();
         $presense->user_id = $request->user_id;
         $presense->in = $request->in;
         $presense->out = $request->out;

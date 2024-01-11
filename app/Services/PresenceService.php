@@ -79,6 +79,10 @@ class PresenceService
                 $presence->is_late = true;
                 $presence->late_minute = $scheduleIn->diffInMinutes($presenceIn);
                 $presence->saveQuietly();
+            }else{
+                $presence->is_late = false;
+                $presence->late_minute = $scheduleIn->diffInMinutes($presenceIn);
+                $presence->saveQuietly();
             }
         }
     }

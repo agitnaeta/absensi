@@ -151,12 +151,12 @@ class ScheduleCrudController extends CrudController
         for ($i = 0; $i < count($userIds); $i++) {
             $user  = User::find($userIds[$i]);
             if($user){
-                Alert::success("Berhasil Update data $i")->flash();
                 $user->schedule_id = $schedules[$i];
                 $user->save();
             }
         }
 
+        Alert::success("Berhasil Update data")->flash();
         return redirect(route('schedule.view.update'));
     }
 
