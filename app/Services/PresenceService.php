@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Presence;
+use App\Models\ScheduleDayOff;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -13,19 +14,50 @@ class PresenceService
     public function __construct(){}
 
     public function record(User $user){
+
+        $now = Carbon::now();
+
+        $isOffDay = $this->checkIfOffDay($user,$now);
+        if($isOffDay){
+            return $this->recordOnOffDay($user,$now);
+        }
+        return $this->recordOnOffDay($user,$now);
+    }
+
+    public function checkIfOffDay(User $user,Carbon $now){
+        $dayOffs = ScheduleDayOff::with('days')
+            ->where('schedule_id',$user->schedule->id)
+            ->get();
+
+        $days =collect();
+        $dayOffs->map(function ($dayOff) use ($days,$now){
+            $now->locale('id_ID');
+            $day = $now->isoFormat('dddd');
+            if(Str::lower($day) == Str::lower($dayOff->days->name)){
+                $days->push($dayOff);
+            }
+        });
+        return $days->count();
+    }
+
+    public function recordOnOffDay(User $user,Carbon $now){
+        $presence = Presence::where('user_id',$user->id)
+            ->whereDate('created_at',Carbon::today())
+            ->first();
+        if(!$presence){
+            return $this->overtimeLogin($user,$now);
+        }
+        // jika sudah pernah
+        $presence->overtime_out = $now->format('Y-m-d H:i:s');
+        $presence->save();
+        return $presence;
+
+    }
+    public function recordOnDaily(User $user, Carbon $now){
         $presence = Presence::where('user_id',$user->id)
             ->whereDate('created_at',Carbon::today())
             ->first();
 
-        $now = Carbon::now();
-
-        // Jika Hari normal
-        $this->recordOnDaily($presence,$user,$now);
-
-        // Jika Hari libur
-
-    }
-    public function recordOnDaily(Presence $presence,User $user, Carbon $now){
         // shift hour
         $in = Carbon::createFromFormat("H:i:s.u",$user->schedule->in);
         $oIn = Carbon::createFromFormat("H:i:s.u",$user->schedule->over_in);
@@ -60,6 +92,15 @@ class PresenceService
             $p->is_late = true;
             $p->late_minute = $now->diffInMinutes($in);
         }
+        $p->save();
+        return $p;
+    }
+
+    public function overtimeLogin(User $user, Carbon $now){
+        $p = new Presence();
+        $p->user_id = $user->id;
+        $p->is_overtime = true;
+        $p->overtime_in = $now->format('Y-m-d H:i:s');
         $p->save();
         return $p;
     }

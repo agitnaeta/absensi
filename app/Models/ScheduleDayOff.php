@@ -15,4 +15,12 @@ class ScheduleDayOff extends Model
       'schedule_id',
       'day'
     ];
+
+    public function schedule(){
+        return $this->hasMany(Schedule::class,'schedule_id','id');
+    }
+
+    public function days(){
+        return $this->hasOne(Day::class,'id','day');
+    }
 }

@@ -16,12 +16,21 @@ class PresenceObserver
         $user = User::with('schedule')
             ->where('id',$presence->user_id)
             ->first();
-        $in = Carbon::createFromFormat("H:i:s.u",$user->schedule->in);
-        $presenceIn = Carbon::createFromFormat("Y-m-d H:i:s",$presence->in);
-        if($in->lessThan($presenceIn)){
-            $presence->is_late = true;
-            $presence->late_minute = $in->diffInMinutes($presenceIn);
-            $presence->saveQuietly();
+
+        // Calculate Late
+        $this->calculateLate($presence,$user);
+
+    }
+
+    public function calculateLate(Presence $presence,User $user){
+        if($presence->in !== null){
+            $in = Carbon::createFromFormat("H:i:s.u",$user->schedule->in);
+            $presenceIn = Carbon::createFromFormat("Y-m-d H:i:s",$presence->in);
+            if($in->lessThan($presenceIn)){
+                $presence->is_late = true;
+                $presence->late_minute = $in->diffInMinutes($presenceIn);
+                $presence->saveQuietly();
+            }
         }
     }
 

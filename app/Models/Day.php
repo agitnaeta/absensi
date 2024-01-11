@@ -12,4 +12,8 @@ class Day extends Model
     use HasFactory;
 
     protected $fillable =['name'];
+
+    public function dayOff(){
+        return $this->hasMany(ScheduleDayOff::class,'day','id');
+    }
 }
