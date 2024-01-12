@@ -27,6 +27,7 @@ class SalaryRecapObserver
     public function updated(SalaryRecap $salaryRecap): void
     {
         $this->salaryService->calculateSalaryRecap($salaryRecap);
+        $this->salaryService->payLoan($salaryRecap);
     }
 
     /**
@@ -34,7 +35,7 @@ class SalaryRecapObserver
      */
     public function deleted(SalaryRecap $salaryRecap): void
     {
-        //
+        $this->salaryService->removeLoanPayment($salaryRecap);
     }
 
     /**

@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\LoanDetailExport;
+use App\Exports\LoanExport;
 use App\Http\Requests\LoanRequest;
 use App\Models\Loan;
 use App\Models\User;
 use App\Repositories\LoanRepository;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 use Prologue\Alerts\Facades\Alert;
 
 /**
@@ -137,6 +141,20 @@ class LoanCrudController extends CrudController
         }
         $loan  = LoanRepository::detail($user);
         return view('loan.detail',compact('loan','user'));
+    }
+
+    public function download(){
+        return Excel::download(new LoanExport,'laporan-kasbon.xlsx');
+    }
+    public function downloadDetail($id){
+        $entry= User::find($id);
+        return Excel::download(new LoanDetailExport($entry),'laporan-kasbon.xlsx');
+    }
+    public function print($id){
+        $user= User::find($id);
+        $loan  = LoanRepository::detail($user);
+        $pdf = Pdf::loadView('loan.table-detail',compact('loan','user'));
+        return $pdf->stream('detail.pdf');
     }
 
 }

@@ -43,6 +43,9 @@ Route::group([
     });
     Route::group(['prefix'=>'loan'],function (){
         Route::get("/recap",[LoanCrudController::class,'loanRecap'])->name('loan.recap');
+        Route::get("/download",[LoanCrudController::class,'download'])->name('loan.download');
+        Route::get("/{id}/download-detail",[LoanCrudController::class,'downloadDetail'])->name('loan.download.detail');
+        Route::get("/{id}/print-detail",[LoanCrudController::class,'print'])->name('loan.download.print');
         Route::get("/{id}/detail",[LoanCrudController::class,'detail'])->name('loan.detail');
     });
 
