@@ -99,6 +99,19 @@ class SalaryRecapCrudController extends CrudController
             'placeholder'=>'payment'
         ]);
 
+        $attrDisable = ['readonly'=>'true','class'=>'disabled-input form-control'];
+
+        $this->crud->field('recap_month')->attributes($attrDisable);
+        $this->crud->field('user_id')->attributes($attrDisable);
+        $this->crud->field('work_day')->attributes($attrDisable);
+        $this->crud->field('late_day')->attributes($attrDisable);
+        $this->crud->field('salary_amount')->attributes($attrDisable);
+        $this->crud->field('overtime_amount')->attributes($attrDisable);
+        $this->crud->field('late_cut')->attributes($attrDisable);
+        $this->crud->field('received')->attributes($attrDisable);
+        $this->crud->field('abstain_cut')->attributes($attrDisable);
+        $this->crud->field('abstain_count')->attributes($attrDisable);
+
         // Translate Field
         $translate = new TranslateFactory();
         foreach($translate->salaryRecap() as  $key => $value){
@@ -111,6 +124,14 @@ class SalaryRecapCrudController extends CrudController
             $this->crud->field($key)->prefix($value);
             $this->crud->column($key)->prefix($value);
         }
+        $this->crud->orderFields([
+            'user_id',
+            'recap_month',
+            'work_day',
+            'abstain_count',
+            'late_count',
+        ]);
+        $this->crud->field('loan_cut')->before('received');
     }
 
     /**

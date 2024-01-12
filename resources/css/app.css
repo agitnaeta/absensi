@@ -5,3 +5,11 @@
     justify-content: right;
     text-align: left;
 }
+.disabled-input {
+    background-color: #f0f0f0; /* Light gray background color */
+    color: #777; /* Dark gray text color */
+    cursor: not-allowed; /* Change cursor to indicate not clickable */
+    opacity: 0.7; /* Reduce opacity to visually indicate it's disabled */
+    /* Add any additional styles you want for the disabled input */
+    pointer-events: none;
+}
