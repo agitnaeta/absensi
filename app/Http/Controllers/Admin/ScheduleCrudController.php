@@ -9,6 +9,7 @@ use App\Models\ScheduleDayOff;
 use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Database\Factories\TranslateFactory;
 use Illuminate\Http\Request;
 use Prologue\Alerts\Facades\Alert;
 use function Symfony\Component\Translation\t;
@@ -35,7 +36,7 @@ class ScheduleCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\Schedule::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/schedule');
-        CRUD::setEntityNameStrings('schedule', 'schedules');
+        CRUD::setEntityNameStrings('Jadwal', 'Jadwal');
     }
 
     /**
@@ -51,6 +52,13 @@ class ScheduleCrudController extends CrudController
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
+
+        $this->fieldModification();
+    }
+
+    protected function setupShowOperation()
+    {
+        $this->fieldModification();
     }
 
     /**
@@ -75,6 +83,7 @@ class ScheduleCrudController extends CrudController
             'option'=>Day::all(),
             'selected'=>[],
         ]);
+        $this->fieldModification();
     }
 
     /**
@@ -102,7 +111,20 @@ class ScheduleCrudController extends CrudController
             'option'=>Day::all(),
             'selected'=>$dayOffs->toArray(),
         ]);
+        $this->fieldModification();
 
+    }
+
+    public function fieldModification(){
+
+
+        $translate = new TranslateFactory();
+        foreach($translate->schedules() as $key => $value){
+            $this->crud->field($key)->label($value);
+            $this->crud->column($key)->label($value);
+        }
+        $this->crud->removeField('created_at');
+        $this->crud->removeField('updated_at');
     }
 
 

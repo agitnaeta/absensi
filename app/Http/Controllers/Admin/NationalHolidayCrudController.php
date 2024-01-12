@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\NationalHolidayRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Database\Factories\TranslateFactory;
 
 /**
  * Class NationalHolidayCrudController
@@ -19,21 +20,31 @@ class NationalHolidayCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
+
+    public function fieldModification(){
+        $translate = new TranslateFactory();
+        foreach($translate->nationalHoliday() as $key => $value){
+            $this->crud->field($key)->label($value);
+            $this->crud->column($key)->label($value);
+        }
+        $this->crud->removeField('created_at');
+        $this->crud->removeField('updated_at');
+    }
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
-     * 
+     *
      * @return void
      */
     public function setup()
     {
         CRUD::setModel(\App\Models\NationalHoliday::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/national-holiday');
-        CRUD::setEntityNameStrings('national holiday', 'national holidays');
+        CRUD::setEntityNameStrings('Libur Nasional', 'Libur Nasional');
     }
 
     /**
      * Define what happens when the List operation is loaded.
-     * 
+     *
      * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
      * @return void
      */
@@ -45,11 +56,12 @@ class NationalHolidayCrudController extends CrudController
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
+        $this->fieldModification();
     }
 
     /**
      * Define what happens when the Create operation is loaded.
-     * 
+     *
      * @see https://backpackforlaravel.com/docs/crud-operation-create
      * @return void
      */
@@ -62,11 +74,12 @@ class NationalHolidayCrudController extends CrudController
          * Fields can be defined using the fluent syntax:
          * - CRUD::field('price')->type('number');
          */
+        $this->fieldModification();
     }
 
     /**
      * Define what happens when the Update operation is loaded.
-     * 
+     *
      * @see https://backpackforlaravel.com/docs/crud-operation-update
      * @return void
      */
