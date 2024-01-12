@@ -3,14 +3,14 @@
 namespace App\Observers;
 
 use App\Models\SalaryRecap;
-use App\Services\SalaryServices;
+use App\Services\SalaryService;
 
 class SalaryRecapObserver
 {
     protected $salaryService;
     public function __construct()
     {
-        $this->salaryService = new SalaryServices();
+        $this->salaryService = new SalaryService();
     }
 
     /**

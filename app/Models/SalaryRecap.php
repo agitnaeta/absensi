@@ -12,7 +12,7 @@ class SalaryRecap extends Model
     use HasFactory;
     protected $fillable = [
         'user_id', 'recap_month', 'work_day', 'late_day', 'salary_amount', 'overtime_amount',
-        'loan_cut', 'late_cut', 'abstain_cut', 'received',
+        'loan_cut', 'late_cut', 'abstain_cut', 'received','abstain_count','desc','paid','method'
     ];
 
     public function user(){

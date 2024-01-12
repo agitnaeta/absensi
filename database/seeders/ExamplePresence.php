@@ -7,6 +7,7 @@ use App\Models\SalaryRecap;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Log;
 
 class ExamplePresence extends Seeder
 {
@@ -17,10 +18,10 @@ class ExamplePresence extends Seeder
     {
         Presence::truncate();
         SalaryRecap::truncate();
-        $users = User::with('schedule')->get();
+        $users = User::with('schedule')->limit(1)->get();
         foreach ($users as $user){
             $dateStart = Carbon::now()->startOfMonth();
-            $dateEnd = Carbon::now()->endOfMonth();
+            $dateEnd = $dateStart->copy()->endOfMonth()->subDays(12);
             $this->inputPresence($dateStart,$dateEnd,$user);
         }
     }
@@ -49,7 +50,7 @@ class ExamplePresence extends Seeder
         $presence->out = $start->format("Y-m-d")." ".$out->format('H:i:s');
         $presence->save();
 
-        if($end->gt($start)){
+        if($end->greaterThanOrEqualTo($start)){
             return $this->inputPresence($start->addDay(),$end,$user);
         }
         return true;

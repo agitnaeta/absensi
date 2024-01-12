@@ -11,6 +11,7 @@
     <x-backpack::menu-dropdown-item title="Jadwal" icon="la la-calendar" :link="backpack_url('schedule')" />
     <x-backpack::menu-dropdown-item title="Setting Jadwal" icon="la la-calendar" :link="route('schedule.view.update')" />
     <x-backpack::menu-dropdown-item title="Kehadiran" icon="la la-calendar-check" :link="backpack_url('presence')" />
+    <x-backpack::menu-dropdown-item title="Libur Nasional" icon="la la-sun" :link="backpack_url('national-holiday')" />
 {{--    <x-backpack::menu-dropdown-item title="Hari Libur" icon="la la-moon" :link="backpack_url('schedule-day-off')" />--}}
 {{--    <x-backpack::menu-dropdown-item title="Daftar Hari" icon="la la-sun" :link="backpack_url('day')" />--}}
 
@@ -26,3 +27,4 @@
     <x-backpack::menu-dropdown-item title="Gaji" icon="la la-money-check" :link="backpack_url('salary')" />
     <x-backpack::menu-dropdown-item title="Rekap Gaji" icon="la la-money-check" :link="backpack_url('salary-recap')" />
 </x-backpack::menu-dropdown>
+

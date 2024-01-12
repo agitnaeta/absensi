@@ -18,7 +18,6 @@ return new class extends Migration
             $table->time('out')->default(0);
             $table->time('over_in')->default(0);
             $table->time('over_out')->default(0);
-            $table->integer('off_day_per_month')->default(0);
             $table->bigInteger('fine_per_minute')->default(0);
             $table->enum('day_off',["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"])
                   ->default("sunday");

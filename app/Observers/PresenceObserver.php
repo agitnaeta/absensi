@@ -4,7 +4,7 @@ namespace App\Observers;
 
 use App\Models\Presence;
 use App\Services\PresenceService;
-use App\Services\SalaryServices;
+use App\Services\SalaryService;
 
 class PresenceObserver
 {
@@ -12,7 +12,7 @@ class PresenceObserver
     protected $salaryService;
     public function __construct() {
         $this->presenceService = new PresenceService();
-        $this->salaryService = new SalaryServices();
+        $this->salaryService = new SalaryService();
     }
 
     /**

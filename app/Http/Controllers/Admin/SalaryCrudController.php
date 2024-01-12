@@ -47,8 +47,6 @@ class SalaryCrudController extends CrudController
     protected function setupShowOperation()
     {
         $this->autoSetupShowOperation();
-        $this->crud->column('amount')->prefix('Rp.');
-        $this->crud->column('overtime_amount')->prefix('Rp.');
         $this->crud->addColumn($this->entityField)->beforeColumn('amount');
     }
 
@@ -66,10 +64,8 @@ class SalaryCrudController extends CrudController
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
-        $this->crud->removeColumn('user_id');
-        $this->crud->column('amount')->prefix('Rp.');
-        $this->crud->column('overtime_amount')->prefix('Rp.');
         $this->crud->addColumn($this->entityField)->beforeColumn('amount');
+        $this->fieldModification();
     }
 
 
@@ -88,10 +84,12 @@ class SalaryCrudController extends CrudController
          * Fields can be defined using the fluent syntax:
          * - CRUD::field('price')->type('number');
          */
-        $this->crud->field($this->entityField)->beforeColumn('amount');
+        $this->fieldModification();
+    }
 
-        $this->crud->field('amount')->prefix('Rp');
-        $this->crud->field('overtime_amount')->prefix('Rp');
+    public function fieldModification(){
+
+        $this->crud->field($this->entityField)->beforeColumn('amount');
         $this->crud->field(
             [
                 'name'        => 'overtime_type',
@@ -103,6 +101,25 @@ class SalaryCrudController extends CrudController
                 ]
             ]
         );
+
+        $this->crud->field('unpaid_leave_deduction')
+            ->label('Besaran Potongan Absen')
+            ->prefix('Rp');
+        $this->crud->field('amount')
+            ->label('Besaran Gaji')
+            ->prefix('Rp');
+        $this->crud->field('overtime_amount')
+            ->label('Besaran 1x Lembur')
+            ->prefix('Rp');
+
+        $this->crud->removeColumn('user_id');
+        $this->crud->addColumn($this->entityField)->makeFirstColumn();
+        // kolom
+        $this->crud->column('amount')->label('Gaji')->prefix('Rp.');
+        $this->crud->column('overtime_amount')->label('1x Overtime')->prefix('Rp.');
+        $this->crud->column('overtime_type')->label('Tipe Lembur');
+        $this->crud->column('unpaid_leave_deduction')->after('overtime')
+            ->label('Potongan Absen');
     }
 
     /**
@@ -121,21 +138,7 @@ class SalaryCrudController extends CrudController
          * Fields can be defined using the fluent syntax:
          * - CRUD::field('price')->type('number');
          */
-        $this->crud->field($this->entityField)->beforeColumn('amount');
-
-        $this->crud->field('amount')->prefix('Rp');
-        $this->crud->field('overtime_amount')->prefix('Rp');
-        $this->crud->field(
-            [
-                'name'        => 'overtime_type',
-                'label'       => 'Jenis Lembur',
-                'type'        => 'radio',
-                'options'     => [
-                    'hour' => 'Per-Jam',
-                    'flat' => 'Flat'
-                ]
-            ]
-        );
+        $this->fieldModification();
     }
     public function store()
     {
@@ -147,6 +150,7 @@ class SalaryCrudController extends CrudController
         $salary->amount = $request->amount;
         $salary->overtime_amount = $request->overtime_amount;
         $salary->overtime_type = $request->overtime_type;
+        $salary->unpaid_leave_deduction = $request->unpaid_leave_deduction;
 
         $salary->save();
         Alert::add('success', 'Berhasil input Gaji')->flash();
@@ -161,6 +165,7 @@ class SalaryCrudController extends CrudController
         $salary->amount = $request->amount;
         $salary->overtime_amount = $request->overtime_amount;
         $salary->overtime_type = $request->overtime_type;
+        $salary->unpaid_leave_deduction = $request->unpaid_leave_deduction;
 
         $salary->save();
         Alert::add('success', 'Berhasil input Gaji')->flash();

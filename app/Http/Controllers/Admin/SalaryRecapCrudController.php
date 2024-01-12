@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\SalaryRecapRequest;
-use App\Models\Schedule;
+use App\Models\SalaryRecap;
 use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Database\Factories\TranslateFactory;
+use Prologue\Alerts\Facades\Alert;
 
 /**
  * Class SalaryRecapCrudController
@@ -30,7 +32,6 @@ class SalaryRecapCrudController extends CrudController
         'label'=>'Nama Karyawan'
     ];
 
-
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
      *
@@ -43,13 +44,13 @@ class SalaryRecapCrudController extends CrudController
         CRUD::setEntityNameStrings('salary recap', 'salary recaps');
         $this->crud->addClause('with','user');
     }
+
+
     protected function setupShowOperation()
     {
         $this->autoSetupShowOperation();
-        $this->crud->column('salary_amount')->prefix('Rp.');
-        $this->crud->column('overtime_amount')->prefix('Rp.');
-        $this->crud->column('received')->prefix('Rp.');
         $this->crud->addColumn($this->entityField)->makeFirstColumn();
+        $this->fieldModification();
     }
 
     /**
@@ -66,21 +67,49 @@ class SalaryRecapCrudController extends CrudController
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
+        $this->fieldModification();
+    }
+
+    public function fieldModification(){
+        // display
         $this->crud->removeColumn('user_id');
         $this->crud->removeColumn('work_day');
         $this->crud->removeColumn('late_day');
         $this->crud->removeColumn('loan_cut');
         $this->crud->removeColumn('late_cut');
         $this->crud->removeColumn('abstain_cut');
-        $this->crud->column('salary_amount')->prefix('Rp.');
-        $this->crud->column('overtime_amount')->prefix('Rp.');
-        $this->crud->column('received')->prefix('Rp.');
+        $this->crud->removeColumn('created_at');
+        $this->crud->removeColumn('received_at');
+        $this->crud->removeColumn('updated_at');
         $this->crud->addColumn($this->entityField)->afterColumn('recap_month');
         $columns = array_merge([$this->entityField],$this->crud->columns());
         $this->crud->setColumns($columns);
-        $this->crud->removeButtons(['delete','update']);
 
+        if($this->crud->getCurrentOperation() != 'show'){
+            $this->crud->removeButtons(['delete','update']);
+        }
 
+        // form
+        $this->crud->field($this->entityField);
+        $this->crud->field([
+            'name'=>'method',
+            'value'=> $this->crud->getCurrentEntry()->method ?? '',
+            'type'=>'payment_method',
+            'placeholder'=>'payment'
+        ]);
+
+        // Translate Field
+        $translate = new TranslateFactory();
+        foreach($translate->salaryRecap() as  $key => $value){
+            $this->crud->field($key)->label($value);
+            $this->crud->column($key)->label($value);
+        }
+
+        // Prefix
+        foreach($translate->salaryRecapPrefix() as  $key => $value){
+            $this->crud->field($key)->prefix($value);
+            $this->crud->column($key)->prefix($value);
+        }
     }
 
     /**
@@ -98,7 +127,8 @@ class SalaryRecapCrudController extends CrudController
          * Fields can be defined using the fluent syntax:
          * - CRUD::field('price')->type('number');
          */
-        $this->crud->field($this->entityField);
+        $this->fieldModification();
+
     }
 
     /**
@@ -110,5 +140,21 @@ class SalaryRecapCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+
+    public function store(){
+        $request = $this->crud->validateRequest();
+        SalaryRecap::create($request->all());
+        Alert::success('Berhasil Update data')->flash();
+        return redirect(route('salary-recap.index'));
+    }
+
+    public function update()
+    {
+        $request = $this->crud->validateRequest();
+        $salaryRecap   = $this->crud->getCurrentEntry();
+        $salaryRecap->update($request->all());
+        Alert::success('Berhasil Update data')->flash();
+        return redirect(route('salary-recap.index'));
     }
 }

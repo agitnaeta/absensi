@@ -6,7 +6,6 @@ use App\Models\Presence;
 use App\Models\ScheduleDayOff;
 use App\Models\User;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class PresenceService
@@ -45,6 +44,20 @@ class PresenceService
         });
         return $days->count() > 0;
     }
+
+    public function useOffDays(User $user)
+    {
+        $dayOffs = ScheduleDayOff::with('days')
+            ->where('schedule_id',$user->schedule->id)
+            ->get();
+
+        $days =collect();
+        $dayOffs->map(function ($dayOff) use ($days){
+            $days->push(Str::lower($dayOff->days->name));
+        });
+        return $days;
+    }
+
     public function login(User $user, Carbon $now): Presence
     {
        $presence = new Presence();
