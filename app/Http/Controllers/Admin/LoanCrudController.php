@@ -11,6 +11,7 @@ use App\Repositories\LoanRepository;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Database\Factories\TranslateFactory;
 use Maatwebsite\Excel\Facades\Excel;
 use Prologue\Alerts\Facades\Alert;
 
@@ -35,7 +36,17 @@ class LoanCrudController extends CrudController
         'type'=>'select',
         'label'=>'Nama Karyawan'
     ];
+    public function fieldModification(){
+        $translate = new TranslateFactory();
+        foreach($translate->loan() as $key => $value){
+            $this->crud->field($key)->label($value);
+            $this->crud->column($key)->label($value);
+        }
+        $this->crud->removeField('created_at');
+        $this->crud->removeField('updated_at');
+    }
     /**
+     *
      * Configure the CrudPanel object. Apply settings to all operations.
      *
      * @return void
@@ -44,13 +55,15 @@ class LoanCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\Loan::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/loan');
-        CRUD::setEntityNameStrings('loan', 'loans');
+        CRUD::setEntityNameStrings('Kasbon', 'Kasbon');
         $this->crud->addClause('with','user');
     }
     protected function setupShowOperation()
     {
         $this->autoSetupShowOperation();
         $this->crud->addColumn($this->entityField)->beforeColumn('amount');
+        $this->fieldModification();
+
     }
 
     /**
@@ -69,6 +82,8 @@ class LoanCrudController extends CrudController
          */
         $this->crud->removeColumn('user_id');
         $this->crud->addColumn($this->entityField)->beforeColumn('amount');
+        $this->fieldModification();
+
     }
 
     /**
@@ -88,6 +103,13 @@ class LoanCrudController extends CrudController
          */
         $this->crud->field('amount')->prefix('Rp.');
         $this->crud->field($this->entityField);
+        $this->fieldModification();
+
+    }
+
+    public function autoSetupShowOperation()
+    {
+        $this->fieldModification();
     }
 
     /**

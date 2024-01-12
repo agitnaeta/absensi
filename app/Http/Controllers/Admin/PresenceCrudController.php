@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\PresenceService;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Database\Factories\TranslateFactory;
 use Illuminate\Http\Request;
 use Prologue\Alerts\Facades\Alert;
 
@@ -43,16 +44,21 @@ class PresenceCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\Presence::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/presence');
-        CRUD::setEntityNameStrings('presence', 'presences');
+        CRUD::setEntityNameStrings('Kehadiran', 'Kehadiran');
         $this->crud->addClause('with','user');
 
     }
 
+    protected function autoSetupShowOperation()
+    {
+        $this->fieldModification();
+    }
 
     protected function setupShowOperation()
     {
         $this->autoSetupShowOperation();
         $this->crud->addColumn($this->entityField)->beforeColumn('in');
+        $this->fieldModification();
     }
 
     /**
@@ -72,6 +78,17 @@ class PresenceCrudController extends CrudController
 
         $this->crud->removeColumn('user_id');
         $this->crud->addColumn($this->entityField)->beforeColumn('in');
+        $this->fieldModification();
+    }
+
+    public function fieldModification(){
+        $translate = new TranslateFactory();
+        foreach($translate->presences() as $key => $value){
+            $this->crud->field($key)->label($value);
+            $this->crud->column($key)->label($value);
+        }
+        $this->crud->removeField('created_at');
+        $this->crud->removeField('updated_at');
     }
 
     /**
@@ -91,6 +108,7 @@ class PresenceCrudController extends CrudController
          */
 
         $this->crud->field($this->entityField);
+        $this->fieldModification();
     }
 
     /**
@@ -102,6 +120,7 @@ class PresenceCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+
     }
 
     public function store()

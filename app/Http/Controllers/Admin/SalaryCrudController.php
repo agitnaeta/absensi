@@ -41,7 +41,7 @@ class SalaryCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\Salary::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/salary');
-        CRUD::setEntityNameStrings('salary', 'salaries');
+        CRUD::setEntityNameStrings('Gaji', 'Gaji');
     }
 
     protected function setupShowOperation()

@@ -28,7 +28,7 @@ class ScheduleDayOffCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\ScheduleDayOff::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/schedule-day-off');
-        CRUD::setEntityNameStrings('schedule day off', 'schedule day offs');
+        CRUD::setEntityNameStrings('Jadwal Libur', 'Jadwal Libur');
         $this->crud->addClause('with','days');
     }
 

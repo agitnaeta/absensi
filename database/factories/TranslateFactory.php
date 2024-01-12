@@ -46,4 +46,39 @@ class TranslateFactory extends Factory
             'desc' => 'Keterangan',
         ];
     }
+
+
+    public function schedules(){
+        return   [
+            'name' => 'Nama',
+            'in' => 'Masuk',
+            'out' => 'Keluar',
+            'over_in' => 'Lembur Masuk',
+            'over_out' => 'Lembur Keluar',
+            'fine_per_minute' => 'Denda per Menit',
+        ];
+
+    }
+    public function presences(){
+        return   [
+            'in' => 'Masuk',
+            'out' => 'Keluar',
+            'is_overtime' => 'Lembur',
+            'is_late' => 'Telat',
+            'late_minute' => 'Waktu Telat(menit)',
+        ];
+
+    }
+
+    public function nationalHoliday(){
+        return [
+            'date'=>'Tanggal'
+        ];
+    }
+    public function loan(){
+        return [
+            'date'=>'Tanggal',
+            'amount'=>'Jumlah'
+        ];
+    }
 }

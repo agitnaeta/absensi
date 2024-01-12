@@ -41,8 +41,9 @@ class SalaryRecapCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\SalaryRecap::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/salary-recap');
-        CRUD::setEntityNameStrings('salary recap', 'salary recaps');
+        CRUD::setEntityNameStrings('Rekap Gaji', 'Rekap Gaji');
         $this->crud->addClause('with','user');
+        $this->crud->denyAccess('create');
     }
 
 
