@@ -3,43 +3,39 @@
 namespace App\Observers;
 
 use App\Models\Presence;
-use App\Models\User;
-use Illuminate\Support\Carbon;
+use App\Services\PresenceService;
+use App\Services\SalaryService;
 
 class PresenceObserver
 {
+    protected $presenceService;
+    protected $salaryService;
+    public function __construct() {
+        $this->presenceService = new PresenceService();
+        $this->salaryService = new SalaryService();
+    }
+
     /**
      * Handle the Presence "created" event.
      */
     public function created(Presence $presence): void
     {
-        $user = User::with('schedule')
-            ->where('id',$presence->user_id)
-            ->first();
-
         // Calculate Late
-        $this->calculateLate($presence,$user);
-
+        $this->presenceService->calculateLate($presence);
+        $this->presenceService->calculateOvertime($presence);
+        $this->salaryService->recap($presence);
     }
 
-    public function calculateLate(Presence $presence,User $user){
-        if($presence->in !== null){
-            $in = Carbon::createFromFormat("H:i:s.u",$user->schedule->in);
-            $presenceIn = Carbon::createFromFormat("Y-m-d H:i:s",$presence->in);
-            if($in->lessThan($presenceIn)){
-                $presence->is_late = true;
-                $presence->late_minute = $in->diffInMinutes($presenceIn);
-                $presence->saveQuietly();
-            }
-        }
-    }
 
     /**
      * Handle the Presence "updated" event.
      */
     public function updated(Presence $presence): void
     {
-        //
+        // Calculate Late
+        $this->presenceService->calculateLate($presence);
+        $this->presenceService->calculateOvertime($presence);
+        $this->salaryService->recap($presence);
     }
 
     /**

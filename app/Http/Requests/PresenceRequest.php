@@ -28,8 +28,6 @@ class PresenceRequest extends FormRequest
             'user_id' => 'required|string',
             'in' => 'required',
             'out' => 'required',
-            'overtime_in' => 'required',
-            'overtime_out' => 'required',
             'is_overtime' => 'required|boolean',
         ];
     }
@@ -60,10 +58,6 @@ class PresenceRequest extends FormRequest
             'in.date_time' => 'Kolom in harus berupa tanggal dan waktu.',
             'out.required' => 'Kolom out harus diisi.',
             'out.date_time' => 'Kolom out harus berupa tanggal dan waktu.',
-            'overtime_in.required' => 'Kolom overtime in harus diisi.',
-            'overtime_in.date_time' => 'Kolom overtime in harus berupa tanggal dan waktu.',
-            'overtime_out.required' => 'Kolom overtime out harus diisi.',
-            'overtime_out.date_time' => 'Kolom overtime out harus berupa tanggal dan waktu.',
             'is_overtime.required' => 'Kolom is overtime harus diisi.',
             'is_overtime.boolean' => 'Kolom is overtime harus berupa nilai boolean.',
             'no_record.required' => 'Kolom no record harus diisi.',

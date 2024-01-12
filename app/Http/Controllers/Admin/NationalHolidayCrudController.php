@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\ScheduleDayOffRequest;
+use App\Http\Requests\NationalHolidayRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
- * Class ScheduleDayOffCrudController
+ * Class NationalHolidayCrudController
  * @package App\Http\Controllers\Admin
  * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
  */
-class ScheduleDayOffCrudController extends CrudController
+class NationalHolidayCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
@@ -21,20 +21,19 @@ class ScheduleDayOffCrudController extends CrudController
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
-     *
+     * 
      * @return void
      */
     public function setup()
     {
-        CRUD::setModel(\App\Models\ScheduleDayOff::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/schedule-day-off');
-        CRUD::setEntityNameStrings('schedule day off', 'schedule day offs');
-        $this->crud->addClause('with','days');
+        CRUD::setModel(\App\Models\NationalHoliday::class);
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/national-holiday');
+        CRUD::setEntityNameStrings('national holiday', 'national holidays');
     }
 
     /**
      * Define what happens when the List operation is loaded.
-     *
+     * 
      * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
      * @return void
      */
@@ -50,13 +49,13 @@ class ScheduleDayOffCrudController extends CrudController
 
     /**
      * Define what happens when the Create operation is loaded.
-     *
+     * 
      * @see https://backpackforlaravel.com/docs/crud-operation-create
      * @return void
      */
     protected function setupCreateOperation()
     {
-        CRUD::setValidation(ScheduleDayOffRequest::class);
+        CRUD::setValidation(NationalHolidayRequest::class);
         CRUD::setFromDb(); // set fields from db columns.
 
         /**
@@ -67,7 +66,7 @@ class ScheduleDayOffCrudController extends CrudController
 
     /**
      * Define what happens when the Update operation is loaded.
-     *
+     * 
      * @see https://backpackforlaravel.com/docs/crud-operation-update
      * @return void
      */

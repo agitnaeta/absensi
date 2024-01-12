@@ -112,9 +112,6 @@ class PresenceCrudController extends CrudController
         $presense->user_id = $request->user_id;
         $presense->in = $request->in;
         $presense->out = $request->out;
-        $presense->overtime_in = $request->overtime_in;
-        $presense->overtime_out = $request->overtime_out;
-        $presense->is_overtime = $request->is_overtime;
 
         $presense->save();
         Alert::add('success', 'Berhasil input data')->flash();
@@ -124,13 +121,10 @@ class PresenceCrudController extends CrudController
     public function update()
     {
         $request = $this->crud->validateRequest();
-        $presense  = new Presence();
+        $presense  = $this->crud->getCurrentEntry();
         $presense->user_id = $request->user_id;
         $presense->in = $request->in;
         $presense->out = $request->out;
-        $presense->overtime_in = $request->overtime_in;
-        $presense->overtime_out = $request->overtime_out;
-        $presense->is_overtime = $request->is_overtime;
 
         $presense->save();
         Alert::add('success', 'Berhasil update data')->flash();

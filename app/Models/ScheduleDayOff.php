@@ -17,7 +17,7 @@ class ScheduleDayOff extends Model
     ];
 
     public function schedule(){
-        return $this->hasMany(Schedule::class,'schedule_id','id');
+        return $this->hasMany(Schedule::class,'id','schedule_id');
     }
 
     public function days(){

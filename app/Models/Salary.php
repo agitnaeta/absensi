@@ -11,7 +11,7 @@ class Salary extends Model
     use CrudTrait;
     use HasFactory;
     protected $fillable = [
-        'user_id', 'amount', 'overtime_amount', 'overtime_type',
+        'user_id', 'amount', 'overtime_amount', 'overtime_type','unpaid_leave_deduction'
     ];
 
     public function user(){

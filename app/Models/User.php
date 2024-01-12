@@ -55,5 +55,9 @@ class User extends Authenticatable
     public function presense(){
         return $this->hasMany(Presence::class,'id','user_id');
     }
+
+    public function salary(){
+        return $this->hasOne(Salary::class,'user_id','id');
+    }
 }
 

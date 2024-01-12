@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\SalaryRecapRequest;
+use App\Models\SalaryRecap;
+use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Database\Factories\TranslateFactory;
+use Prologue\Alerts\Facades\Alert;
 
 /**
  * Class SalaryRecapCrudController
@@ -19,9 +23,18 @@ class SalaryRecapCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
+    protected $entityField = [
+        'name'=>'user_id',
+        'entity'=>'user',
+        'model'=>User::class,
+        'attribute'=>'name',
+        'type'=>'select',
+        'label'=>'Nama Karyawan'
+    ];
+
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
-     * 
+     *
      * @return void
      */
     public function setup()
@@ -29,11 +42,20 @@ class SalaryRecapCrudController extends CrudController
         CRUD::setModel(\App\Models\SalaryRecap::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/salary-recap');
         CRUD::setEntityNameStrings('salary recap', 'salary recaps');
+        $this->crud->addClause('with','user');
+    }
+
+
+    protected function setupShowOperation()
+    {
+        $this->autoSetupShowOperation();
+        $this->crud->addColumn($this->entityField)->makeFirstColumn();
+        $this->fieldModification();
     }
 
     /**
      * Define what happens when the List operation is loaded.
-     * 
+     *
      * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
      * @return void
      */
@@ -45,11 +67,54 @@ class SalaryRecapCrudController extends CrudController
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
+        $this->fieldModification();
+    }
+
+    public function fieldModification(){
+        // display
+        $this->crud->removeColumn('user_id');
+        $this->crud->removeColumn('work_day');
+        $this->crud->removeColumn('late_day');
+        $this->crud->removeColumn('loan_cut');
+        $this->crud->removeColumn('late_cut');
+        $this->crud->removeColumn('abstain_cut');
+        $this->crud->removeColumn('created_at');
+        $this->crud->removeColumn('received_at');
+        $this->crud->removeColumn('updated_at');
+        $this->crud->addColumn($this->entityField)->afterColumn('recap_month');
+        $columns = array_merge([$this->entityField],$this->crud->columns());
+        $this->crud->setColumns($columns);
+
+        if($this->crud->getCurrentOperation() != 'show'){
+            $this->crud->removeButtons(['delete','update']);
+        }
+
+        // form
+        $this->crud->field($this->entityField);
+        $this->crud->field([
+            'name'=>'method',
+            'value'=> $this->crud->getCurrentEntry()->method ?? '',
+            'type'=>'payment_method',
+            'placeholder'=>'payment'
+        ]);
+
+        // Translate Field
+        $translate = new TranslateFactory();
+        foreach($translate->salaryRecap() as  $key => $value){
+            $this->crud->field($key)->label($value);
+            $this->crud->column($key)->label($value);
+        }
+
+        // Prefix
+        foreach($translate->salaryRecapPrefix() as  $key => $value){
+            $this->crud->field($key)->prefix($value);
+            $this->crud->column($key)->prefix($value);
+        }
     }
 
     /**
      * Define what happens when the Create operation is loaded.
-     * 
+     *
      * @see https://backpackforlaravel.com/docs/crud-operation-create
      * @return void
      */
@@ -62,16 +127,34 @@ class SalaryRecapCrudController extends CrudController
          * Fields can be defined using the fluent syntax:
          * - CRUD::field('price')->type('number');
          */
+        $this->fieldModification();
+
     }
 
     /**
      * Define what happens when the Update operation is loaded.
-     * 
+     *
      * @see https://backpackforlaravel.com/docs/crud-operation-update
      * @return void
      */
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+
+    public function store(){
+        $request = $this->crud->validateRequest();
+        SalaryRecap::create($request->all());
+        Alert::success('Berhasil Update data')->flash();
+        return redirect(route('salary-recap.index'));
+    }
+
+    public function update()
+    {
+        $request = $this->crud->validateRequest();
+        $salaryRecap   = $this->crud->getCurrentEntry();
+        $salaryRecap->update($request->all());
+        Alert::success('Berhasil Update data')->flash();
+        return redirect(route('salary-recap.index'));
     }
 }

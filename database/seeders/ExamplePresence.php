@@ -3,10 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\Presence;
+use App\Models\SalaryRecap;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Log;
 
 class ExamplePresence extends Seeder
 {
@@ -15,11 +16,12 @@ class ExamplePresence extends Seeder
      */
     public function run(): void
     {
-        $users = User::with('schedule')->get();
+        Presence::truncate();
+        SalaryRecap::truncate();
+        $users = User::with('schedule')->limit(1)->get();
         foreach ($users as $user){
-
-            $dateStart = Carbon::now()->subMonths(1);
-            $dateEnd = Carbon::now()->addMonths(2);
+            $dateStart = Carbon::now()->startOfMonth();
+            $dateEnd = $dateStart->copy()->endOfMonth()->subDays(12);
             $this->inputPresence($dateStart,$dateEnd,$user);
         }
     }
@@ -27,26 +29,28 @@ class ExamplePresence extends Seeder
     public function inputPresence(Carbon $start , Carbon $end, User $user){
         $schedule = (object)[
             "in"=>Carbon::createFromFormat("H:i:s.u",$user->schedule->in),
-            "out"=>Carbon::createFromFormat("H:i:s.u",$user->schedule->out)->format("H:i:s"),
-            "over_in"=>Carbon::createFromFormat("H:i:s.u",$user->schedule->over_in)->format("H:i:s"),
-            "over_out"=>Carbon::createFromFormat("H:i:s.u",$user->schedule->over_out)->format("H:i:s"),
+            "out"=>Carbon::createFromFormat("H:i:s.u",$user->schedule->out),
         ];
 
         $late = rand(0,1);
         $in = $schedule->in->copy();
         if($late){
-           $in =  $schedule->in->addMinutes(rand(1,10));
+           $in =  $in->addMinutes(rand(1,10));
+        }
+
+        $overtime = rand(1,0);
+        $out = $schedule->out->copy();
+        if($overtime){
+            $out =  $out->addMinutes(rand(1,60));
         }
 
         $presence = new Presence();
         $presence->user_id = $user->id;
         $presence->in = $start->format("Y-m-d")." ".$in->format('H:i:s');
-        $presence->out = $start->format("Y-m-d")." ".$schedule->out;
-        $presence->overtime_in = $start->format("Y-m-d")." ".$schedule->over_in;
-        $presence->overtime_out = $start->format("Y-m-d")." ".$schedule->over_out;
+        $presence->out = $start->format("Y-m-d")." ".$out->format('H:i:s');
         $presence->save();
 
-        if($end->gt($start)){
+        if($end->greaterThanOrEqualTo($start)){
             return $this->inputPresence($start->addDay(),$end,$user);
         }
         return true;

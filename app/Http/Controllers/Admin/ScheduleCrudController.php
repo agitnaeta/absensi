@@ -11,6 +11,7 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Illuminate\Http\Request;
 use Prologue\Alerts\Facades\Alert;
+use function Symfony\Component\Translation\t;
 
 /**
  * Class ScheduleCrudController
@@ -46,7 +47,6 @@ class ScheduleCrudController extends CrudController
     protected function setupListOperation()
     {
         CRUD::setFromDb(); // set columns from db columns.
-
         /**
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
@@ -151,12 +151,12 @@ class ScheduleCrudController extends CrudController
         for ($i = 0; $i < count($userIds); $i++) {
             $user  = User::find($userIds[$i]);
             if($user){
-                Alert::success("Berhasil Update data $i")->flash();
                 $user->schedule_id = $schedules[$i];
                 $user->save();
             }
         }
 
+        Alert::success("Berhasil Update data")->flash();
         return redirect(route('schedule.view.update'));
     }
 

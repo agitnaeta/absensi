@@ -30,7 +30,6 @@ class ScheduleRequest extends FormRequest
             'out' => 'required',
             'over_in' => 'required',
             'over_out' => 'required',
-            'off_day_per_month' => 'required|integer',
             'fine_per_minute' => 'required|integer',
             'day_off' => 'required',
         ];
@@ -66,8 +65,6 @@ class ScheduleRequest extends FormRequest
             'over_in.date_format' => 'Kolom lembur masuk harus memiliki format H:i.',
             'over_out.required' => 'Kolom lembur keluar harus diisi.',
             'over_out.date_format' => 'Kolom lembur keluar harus memiliki format H:i.',
-            'off_day_per_month.required' => 'Kolom off day per bulan harus diisi.',
-            'off_day_per_month.integer' => 'Kolom off day per bulan harus berupa bilangan bulat.',
             'fine_per_minute.required' => 'Kolom denda per menit harus diisi.',
             'fine_per_minute.integer' => 'Kolom denda per menit harus berupa bilangan bulat.',
             'day_off.required' => 'Kolom hari libur harus diisi.',

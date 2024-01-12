@@ -16,7 +16,6 @@ class Schedule extends Model
         'out',
         'over_in',
         'over_out',
-        'off_day_per_month',
         'fine_per_minute',
     ];
 
