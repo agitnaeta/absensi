@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ExamplePresence extends Seeder
 {
@@ -28,8 +29,8 @@ class ExamplePresence extends Seeder
 
     public function inputPresence(Carbon $start , Carbon $end, User $user){
         $schedule = (object)[
-            "in"=>Carbon::createFromFormat("H:i:s.u",$user->schedule->in),
-            "out"=>Carbon::createFromFormat("H:i:s.u",$user->schedule->out),
+            "in"=>Carbon::createFromFormat("H:i:s",Str::substr($user->schedule->in,0,8)),
+            "out"=>Carbon::createFromFormat("H:i:s",Str::substr($user->schedule->out,0,8)),
         ];
 
         $late = rand(0,1);

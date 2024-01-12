@@ -80,7 +80,11 @@ class PresenceService
 
         if($presence->in !== null){
             // catatan waktu masuk
-            $timeIn = Carbon::createFromFormat("H:i:s.u",$user->schedule->in,self::TIME_ZONE);
+            $timeIn = Carbon::createFromFormat(
+                "H:i:s",
+                Str::substr($user->schedule->in,0,8),
+                self::TIME_ZONE
+            );
 
             // Absen masuk
             $presenceIn = Carbon::parse($presence->in,self::TIME_ZONE);
@@ -113,7 +117,9 @@ class PresenceService
 
         if($presence->out !== null){
             // jadwal waktu keluar
-            $overtimeIn = Carbon::createFromFormat("H:i:s.u",$user->schedule->over_in,self::TIME_ZONE);
+            $overtimeIn = Carbon::createFromFormat("H:i:s",
+                Str::substr($user->schedule->over_in,0,8),
+                self::TIME_ZONE);
 
             // Absen keluar
             $presenceOut = Carbon::parse($presence->out,self::TIME_ZONE);
