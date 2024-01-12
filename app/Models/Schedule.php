@@ -16,7 +16,7 @@ class Schedule extends Model
         'out',
         'over_in',
         'over_out',
-        'fine_per_minute',
+//        'fine_per_minute',
     ];
 
     public function user()

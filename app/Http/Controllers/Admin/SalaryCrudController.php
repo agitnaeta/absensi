@@ -111,15 +111,27 @@ class SalaryCrudController extends CrudController
         $this->crud->field('overtime_amount')
             ->label('Besaran 1x Lembur')
             ->prefix('Rp');
+        $this->crud->field('fine_per_minute')
+            ->label('Denda Per-Menit')
+            ->prefix('Rp.');
 
         $this->crud->removeColumn('user_id');
         $this->crud->addColumn($this->entityField)->makeFirstColumn();
         // kolom
+        $this->crud->column('fine_per_minute')
+            ->makeLast()
+            ->label('Denda Per-Menit')
+            ->prefix('Rp.');
         $this->crud->column('amount')->label('Gaji')->prefix('Rp.');
         $this->crud->column('overtime_amount')->label('1x Overtime')->prefix('Rp.');
         $this->crud->column('overtime_type')->label('Tipe Lembur');
         $this->crud->column('unpaid_leave_deduction')->after('overtime')
             ->label('Potongan Absen');
+    }
+
+    public function autoSetupShowOperation()
+    {
+        $this->fieldModification();
     }
 
     /**
@@ -145,14 +157,7 @@ class SalaryCrudController extends CrudController
         //  'user_id', 'amount', 'overtime_amount', 'overtime_type',
 
         $request = $this->crud->validateRequest();
-        $salary  = new Salary();
-        $salary->user_id = $request->user_id;
-        $salary->amount = $request->amount;
-        $salary->overtime_amount = $request->overtime_amount;
-        $salary->overtime_type = $request->overtime_type;
-        $salary->unpaid_leave_deduction = $request->unpaid_leave_deduction;
-
-        $salary->save();
+        Salary::create($request->all());
         Alert::add('success', 'Berhasil input Gaji')->flash();
         return redirect(route('salary.index'));
     }
@@ -161,13 +166,7 @@ class SalaryCrudController extends CrudController
     {
         $request = $this->crud->validateRequest();
         $salary = Salary::find($this->crud->getCurrentEntryId());
-        $salary->user_id = $request->user_id;
-        $salary->amount = $request->amount;
-        $salary->overtime_amount = $request->overtime_amount;
-        $salary->overtime_type = $request->overtime_type;
-        $salary->unpaid_leave_deduction = $request->unpaid_leave_deduction;
-
-        $salary->save();
+        $salary->update($request->all());
         Alert::add('success', 'Berhasil input Gaji')->flash();
         return redirect(route('salary.index'));
     }

@@ -14,7 +14,7 @@
                 <thead>
                 <tr>
                     <th>ID User</th>
-                    <th>Name</th>
+                    <th>Nama</th>
                     <th>Kasbon</th>
                     <th>Terbayar</th>
                     <th>Sisa</th>

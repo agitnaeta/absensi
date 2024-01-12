@@ -44,6 +44,7 @@ class TranslateFactory extends Factory
             'paid' => 'Dibayar',
             'method' => 'Metode Pembayaran',
             'desc' => 'Keterangan',
+            'late_minute_count' => 'Menit Telat',
         ];
     }
 
@@ -55,7 +56,7 @@ class TranslateFactory extends Factory
             'out' => 'Keluar',
             'over_in' => 'Lembur Masuk',
             'over_out' => 'Lembur Keluar',
-            'fine_per_minute' => 'Denda per Menit',
+//            'fine_per_minute' => 'Denda per Menit',
         ];
 
     }

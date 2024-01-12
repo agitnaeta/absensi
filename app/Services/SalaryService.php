@@ -9,6 +9,7 @@ use App\Models\Salary;
 use App\Models\SalaryRecap;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -72,7 +73,14 @@ class SalaryService
         $salaryRecap->overtime_amount = $presence->sum('is_overtime') * $salary->overtime_amount;
         $salaryRecap->abstain_cut = $this->unpaidLeaveDeduction($salaryRecap,$salary);
         $salaryRecap->abstain_count = $this->getAbstain($salaryRecap,$salary);
-        $salaryRecap->received = $salaryRecap->salary_amount + $salaryRecap->overtime_amount - $salaryRecap->loan_cut - $salaryRecap->abstain_cut;
+        $salaryRecap->late_minute_count = $presence->sum('late_minute');
+        $salaryRecap->late_cut = $this->deductSalaryByLate($salaryRecap);
+        $salaryRecap->received = $salaryRecap->salary_amount +
+            $salaryRecap->overtime_amount -
+            $salaryRecap->loan_cut -
+            $salaryRecap->abstain_cut -
+            $salaryRecap->late_cut;
+
         $salaryRecap->saveQuietly();
 
     }
@@ -173,6 +181,11 @@ class SalaryService
     public function removeLoanPayment(SalaryRecap $salaryRecap){
             LoanPayment::where('salary_recap_id',$salaryRecap->id)
                 ->first()->delete();
+    }
+
+    public function deductSalaryByLate(SalaryRecap $salaryRecap){
+        $user = User::with('salary')->find($salaryRecap->user_id);
+        return $user->salary->fine_per_minute * $salaryRecap->late_minute_count;
     }
 
 }

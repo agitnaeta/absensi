@@ -111,6 +111,7 @@ class SalaryRecapCrudController extends CrudController
         $this->crud->field('received')->attributes($attrDisable);
         $this->crud->field('abstain_cut')->attributes($attrDisable);
         $this->crud->field('abstain_count')->attributes($attrDisable);
+        $this->crud->field('late_minute_count')->attributes($attrDisable);
 
         // Translate Field
         $translate = new TranslateFactory();
@@ -130,6 +131,7 @@ class SalaryRecapCrudController extends CrudController
             'work_day',
             'abstain_count',
             'late_count',
+            'late_minute_count',
         ]);
         $this->crud->field('loan_cut')->before('received');
     }
