@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\NationalHoliday;
 use App\Models\Presence;
 use App\Models\Salary;
 use App\Models\SalaryRecap;
@@ -77,6 +78,10 @@ class SalaryService
 
     public function unpaidLeaveDeduction(SalaryRecap $salaryRecap, Salary $salary){
         $workDayInMonth = $this->workdayInAMonth($salaryRecap);
+
+        // National Holiday
+        $workDayInMonth = $workDayInMonth- $this->countOfNationalHoliday($salaryRecap);
+
         if($salaryRecap->work_day < $workDayInMonth){
             $abstain  = $workDayInMonth - $salaryRecap->work_day;
             return $abstain * $salary->unpaid_leave_deduction;
@@ -127,6 +132,13 @@ class SalaryService
     public function getRecapMonthCarbon(SalaryRecap $salaryRecap)
     {
         return Carbon::createFromFormat('m-Y',$salaryRecap->recap_month);
+    }
+
+    public function countOfNationalHoliday(SalaryRecap$salaryRecap){
+        $time = $this->getRecapMonthCarbon($salaryRecap);
+        $nationalHoliday = NationalHoliday::whereMonth('date',$time->month)
+            ->whereYear($time->year)->get();
+        return $nationalHoliday->count();
     }
 
 
