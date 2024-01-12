@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\LoanPayment;
 use App\Models\NationalHoliday;
 use App\Models\Presence;
 use App\Models\Salary;
@@ -137,9 +138,41 @@ class SalaryService
     public function countOfNationalHoliday(SalaryRecap$salaryRecap){
         $time = $this->getRecapMonthCarbon($salaryRecap);
         $nationalHoliday = NationalHoliday::whereMonth('date',$time->month)
-            ->whereYear($time->year)->get();
+            ->whereYear('date',$time->year)->get();
         return $nationalHoliday->count();
     }
 
+
+    function payLoan(SalaryRecap $salaryRecap){
+        if($salaryRecap->loan_cut > 0){
+            // Check if a LoanPayment with the given salary_recap_id already exists
+            $existingLoanPayment = LoanPayment::where('salary_recap_id', $salaryRecap->id)->first();
+
+            if (!$existingLoanPayment) {
+                // If no existing LoanPayment, create and save a new one
+                $loanPayment = new LoanPayment();
+
+                $loanPayment->user_id = $salaryRecap->user_id;
+                $loanPayment->salary_recap_id = $salaryRecap->id;
+                $loanPayment->amount = $salaryRecap->loan_cut;
+                $loanPayment->date = $salaryRecap->updated_at;
+
+                $loanPayment->save();
+            } else {
+                $existingLoanPayment->update([
+                    'user_id' => $salaryRecap->user_id,
+                    'amount' => $salaryRecap->loan_cut,
+                    'date' => $salaryRecap->updated_at,
+                ]);
+            }
+
+
+        }
+    }
+
+    public function removeLoanPayment(SalaryRecap $salaryRecap){
+            LoanPayment::where('salary_recap_id',$salaryRecap->id)
+                ->first()->delete();
+    }
 
 }

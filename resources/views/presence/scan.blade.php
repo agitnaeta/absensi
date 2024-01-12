@@ -10,6 +10,11 @@
         <div class="col-sm-2 offset-2">
             <video id="preview"></video>
         </div>
+        <audio style="display: none" id="audioPlayer" controls>
+            <source src="{{asset('/sound/login.mp3')}}" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+
     </div>
     <script type="text/javascript">
         let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
@@ -21,6 +26,7 @@
                   qr:content
                 },
                 success: function (params) {
+                    play()
                     new Noty({
                         type: "success",
                         text: 'Absen Tersimpan',
@@ -64,5 +70,18 @@
             return i;
         }
         startTime()
+
+
+        function play(){
+            var audioPlayer = document.getElementById('audioPlayer');
+
+            // Check if the audio is paused or ended
+            if (audioPlayer.paused || audioPlayer.ended) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        }
+
     </script>
 @endsection

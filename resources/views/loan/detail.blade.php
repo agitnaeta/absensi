@@ -2,9 +2,20 @@
 @section('content')
     <div class="container-fluid animated fadeIn">
         <h1>Rekap Kasbon {{$user->name}}</h1>
+        <div class="row">
+           <div class="col mb-2 text-right">
+               <a class="btn btn-success" href="{{route('loan.download.detail',['id'=>$user->id])}}">
+                <i class="la la-download"></i>    Download
+               </a>
+               <a class="btn btn-primary" href="{{route('loan.download.print',['id'=>$user->id])}}">
+                   <i class="la la-print"></i>    Print
+               </a>
+           </div>
+        </div>
         <div>
             <h3 class="alert">Sisa Kasbon @rupiah($loan['total'])</h3>
         </div>
+
         <div class="row">
                 <div class="col">
                     <table class="table table-striped table-hover nowrap rounded card-table table-vcenter card d-table shadow-xs border-xs dataTable dtr-inline collapsed has-hidden-columns">
