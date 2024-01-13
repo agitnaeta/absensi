@@ -53,4 +53,5 @@ Route::group([
     Route::crud('day', 'DayCrudController');
     Route::crud('schedule-day-off', 'ScheduleDayOffCrudController');
     Route::crud('national-holiday', 'NationalHolidayCrudController');
+    Route::crud('company-profile', 'CompanyProfileCrudController');
 }); // this should be the absolute last line of this file

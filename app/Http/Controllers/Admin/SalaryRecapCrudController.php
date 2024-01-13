@@ -50,7 +50,6 @@ class SalaryRecapCrudController extends CrudController
     protected function setupShowOperation()
     {
         $this->autoSetupShowOperation();
-        $this->crud->addColumn($this->entityField)->makeFirstColumn();
         $this->fieldModification();
     }
 
@@ -72,68 +71,72 @@ class SalaryRecapCrudController extends CrudController
     }
 
     public function fieldModification(){
-        // display
-        $this->crud->removeColumn('user_id');
-        $this->crud->removeColumn('work_day');
-        $this->crud->removeColumn('late_day');
-        $this->crud->removeColumn('loan_cut');
-        $this->crud->removeColumn('late_cut');
-        $this->crud->removeColumn('abstain_cut');
-        $this->crud->removeColumn('created_at');
-        $this->crud->removeColumn('received_at');
-        $this->crud->removeColumn('updated_at');
+        // Columns
+        $columnsToRemove = [
+            'user_id',
+            'work_day',
+            'late_day',
+            'loan_cut',
+            'late_cut',
+            'abstain_cut',
+            'created_at',
+            'received_at',
+            'updated_at'
+        ];
+        $this->crud->removeColumns($columnsToRemove);
         $this->crud->addColumn($this->entityField)->afterColumn('recap_month');
-        $columns = array_merge([$this->entityField],$this->crud->columns());
+        $columns = array_merge([$this->entityField], $this->crud->columns());
         $this->crud->setColumns($columns);
 
-        if($this->crud->getCurrentOperation() != 'show'){
-            $this->crud->removeButtons(['delete','update']);
+// Buttons
+        if ($this->crud->getCurrentOperation() != 'show') {
+            $this->crud->removeButtons(['delete', 'update']);
         }
 
-        // form
-        $this->crud->field($this->entityField);
-        $this->crud->field([
-            'name'=>'method',
-            'value'=> $this->crud->getCurrentEntry()->method ?? '',
-            'type'=>'payment_method',
-            'placeholder'=>'payment'
-        ]);
+// Form fields
+        $disableFields = [
+            'recap_month',
+            'user_id',
+            'work_day',
+            'late_day',
+            'salary_amount',
+            'overtime_amount',
+            'late_cut',
+            'received',
+            'abstain_cut',
+            'abstain_count',
+            'late_minute_count'
+        ];
+        foreach ($disableFields as $field) {
+            $this->crud->field($field)->attributes(['readonly' => true, 'class' => 'disabled-input form-control']);
+        }
 
-        $attrDisable = ['readonly'=>'true','class'=>'disabled-input form-control'];
-
-        $this->crud->field('recap_month')->attributes($attrDisable);
-        $this->crud->field('user_id')->attributes($attrDisable);
-        $this->crud->field('work_day')->attributes($attrDisable);
-        $this->crud->field('late_day')->attributes($attrDisable);
-        $this->crud->field('salary_amount')->attributes($attrDisable);
-        $this->crud->field('overtime_amount')->attributes($attrDisable);
-        $this->crud->field('late_cut')->attributes($attrDisable);
-        $this->crud->field('received')->attributes($attrDisable);
-        $this->crud->field('abstain_cut')->attributes($attrDisable);
-        $this->crud->field('abstain_count')->attributes($attrDisable);
-        $this->crud->field('late_minute_count')->attributes($attrDisable);
-
-        // Translate Field
+// Translate Field
         $translate = new TranslateFactory();
-        foreach($translate->salaryRecap() as  $key => $value){
+        foreach ($translate->salaryRecap() as $key => $value) {
             $this->crud->field($key)->label($value);
             $this->crud->column($key)->label($value);
         }
 
-        // Prefix
-        foreach($translate->salaryRecapPrefix() as  $key => $value){
+// Prefix
+        foreach ($translate->salaryRecapPrefix() as $key => $value) {
             $this->crud->field($key)->prefix($value);
             $this->crud->column($key)->prefix($value);
         }
+
+// Order Fields
         $this->crud->orderFields([
             'user_id',
             'recap_month',
             'work_day',
             'abstain_count',
             'late_count',
-            'late_minute_count',
+            'late_minute_count'
         ]);
+
+// Field order
         $this->crud->field('loan_cut')->before('received');
+
     }
 
     /**

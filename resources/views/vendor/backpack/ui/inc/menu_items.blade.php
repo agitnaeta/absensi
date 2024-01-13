@@ -28,3 +28,5 @@
     <x-backpack::menu-dropdown-item title="Rekap Gaji" icon="la la-money-check" :link="backpack_url('salary-recap')" />
 </x-backpack::menu-dropdown>
 
+
+<x-backpack::menu-item title="Profile Perusahaan" icon="la la-building" :link="backpack_url('company-profile')" />

@@ -9,8 +9,7 @@ use App\Models\Salary;
 use App\Models\SalaryRecap;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
+use Database\Factories\TranslateFactory;
 use Illuminate\Support\Str;
 
 class SalaryService
@@ -185,7 +184,13 @@ class SalaryService
 
     public function deductSalaryByLate(SalaryRecap $salaryRecap){
         $user = User::with('salary')->find($salaryRecap->user_id);
-        return $user->salary->fine_per_minute * $salaryRecap->late_minute_count;
+        if($user->salary->type  === TranslateFactory::MINUTE){
+            return $user->salary->fine_per_minute * $salaryRecap->late_minute_count;
+        }
+        else
+        {
+            return $user->salary->fine * $salaryRecap->late_day;
+        }
     }
 
 }

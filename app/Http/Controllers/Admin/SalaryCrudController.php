@@ -90,6 +90,11 @@ class SalaryCrudController extends CrudController
     public function fieldModification(){
 
         $this->crud->field($this->entityField)->beforeColumn('amount');
+
+        $this->crud->field('fine')
+            ->prefix('Rp.')
+            ->after('fine_per_minute')
+            ->label('Besaran Denda Telat - Flat');
         $this->crud->field(
             [
                 'name'        => 'overtime_type',
@@ -99,6 +104,18 @@ class SalaryCrudController extends CrudController
                     'hour' => 'Per-Jam',
                     'flat' => 'Flat'
                 ]
+            ]
+        );
+        $this->crud->field(
+            [
+                'name'        => 'fine_type',
+                'label'       => 'Jenis Denda Telat',
+                'type'        => 'radio',
+                'options'=>[
+                        'minute' => 'Per-Menit',
+                        'flat' => 'Flat',
+                ],
+                'value'=>$this->crud->getCurrentEntry()->fine_type ?? ''
             ]
         );
 

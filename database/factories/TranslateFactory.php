@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class TranslateFactory extends Factory
 {
+
+    const MINUTE ='minute';
+    const FLAT ='flat';
+    const HOUR='jam';
     /**
      * Define the model's default state.
      *
