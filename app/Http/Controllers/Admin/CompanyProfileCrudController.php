@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\CompanyProfileRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Database\Factories\TranslateFactory;
 use Illuminate\Session\Store;
 use Illuminate\Support\Facades\Storage;
 
@@ -30,7 +31,7 @@ class CompanyProfileCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\CompanyProfile::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/company-profile');
-        CRUD::setEntityNameStrings('company profile', 'company profiles');
+        CRUD::setEntityNameStrings('Profile Perusahaan', 'Pofile Perusahaan');
     }
 
     public function autoSetupShowOperation()
@@ -39,7 +40,7 @@ class CompanyProfileCrudController extends CrudController
         CRUD::column('image')->remove();
         $this->crud->column([
             'name'=>'image',
-            'label'=>'Gambar',
+            'label'=>'Logo Perusahaan',
             'type'=>'custom_html',
             'value'=>function($entry){
                  $path = "public/$entry->image";
@@ -66,6 +67,17 @@ class CompanyProfileCrudController extends CrudController
         $this->crud->removeColumn('image');
     }
 
+    function fieldModification()
+    {
+        $translate = new TranslateFactory();
+        foreach($translate->company() as $key => $value){
+            $this->crud->field($key)->label($value);
+            $this->crud->column($key)->label($value);
+        }
+        $this->crud->removeField('created_at');
+        $this->crud->removeField('updated_at');
+    }
+
     /**
      * Define what happens when the Create operation is loaded.
      *
@@ -88,6 +100,7 @@ class CompanyProfileCrudController extends CrudController
                 'disk' => 'public', // the disk where file will be stored
                 'path' => 'uploads', // the path inside the disk where file will be stored
             ]);
+        $this->fieldModification();
     }
 
     /**

@@ -86,4 +86,13 @@ class TranslateFactory extends Factory
             'amount'=>'Jumlah'
         ];
     }
+
+    public function company(){
+        return[
+            'name'=>'nama',
+            'image'=>'Logo Perusaan',
+            'address'=>'Alamat',
+            'phone'=>'telepon',
+        ];
+    }
 }
