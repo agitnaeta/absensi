@@ -146,6 +146,7 @@ class UserCrudController extends CrudController
     }
 
     function fieldModification(){
+
         CRUD::field([
             'Label'=> "Jadwal",
             'name'=>'schedule_id',
@@ -159,6 +160,8 @@ class UserCrudController extends CrudController
                 'disk' => 'public', // the disk where file will be stored
                 'path' => 'uploads', // the path inside the disk where file will be stored
             ]);
+
+
     }
 
     public function update()
@@ -195,10 +198,11 @@ class UserCrudController extends CrudController
         $user = User::find($id);
         $company = CompanyProfile::find(1);
         $userImage = Storage::path("public/$user->image");
+        $company->image = Storage::path("public/$company->id_card");
         $isUserImage = strlen($userImage) > 0 ;
 //        return view('user.detail',compact('user','company','userImage','isUserImage'));
         $pdf =  Pdf::loadView('user.detail',compact('user','company','userImage','isUserImage'))
-        ->setPaper([0,0,291,463],'p');
+        ->setPaper([0,0,300,470],'p');
         return $pdf->stream("sample.pdf");
     }
 }

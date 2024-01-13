@@ -93,6 +93,7 @@ class TranslateFactory extends Factory
             'image'=>'Logo Perusaan',
             'address'=>'Alamat',
             'phone'=>'telepon',
+            'id_card'=>'ID Card Background',
         ];
     }
 }

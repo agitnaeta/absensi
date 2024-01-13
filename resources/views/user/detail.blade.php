@@ -17,7 +17,7 @@
             font-size: 24px;
         }
         table{
-            margin-top: 20px;
+            margin-top: 38px;
             width: 100%;
         }
         .mt{
@@ -29,7 +29,8 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background-color: linear-gradient(45deg, #2ecc71, #3498db);;
+            opacity: 0.5;
+            background-image: url({{$company->image}});
         }
     </style>
 </head>

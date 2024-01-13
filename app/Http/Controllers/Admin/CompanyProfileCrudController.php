@@ -47,6 +47,20 @@ class CompanyProfileCrudController extends CrudController
                  $storage = Storage::url($path);
                  return "<img width='100' height='100' src='$storage' />";
             }
+
+        ]);
+
+        CRUD::column('id_card')->remove();
+        $this->crud->column([
+            'name'=>'id_card',
+            'label'=>'Background Id Card',
+            'type'=>'custom_html',
+            'value'=>function($entry){
+                $path = "public/$entry->id_card";
+                $storage = Storage::url($path);
+                return "<img width='300' height='470' src='$storage' />";
+            }
+
         ]);
     }
 
@@ -96,6 +110,13 @@ class CompanyProfileCrudController extends CrudController
 
         CRUD::field('image')
             ->type('upload')
+            ->withFiles([
+                'disk' => 'public', // the disk where file will be stored
+                'path' => 'uploads', // the path inside the disk where file will be stored
+            ]);
+        CRUD::field('id_card')
+            ->type('upload')
+            ->hint('Ukuran terbaik 300px X 470px')
             ->withFiles([
                 'disk' => 'public', // the disk where file will be stored
                 'path' => 'uploads', // the path inside the disk where file will be stored

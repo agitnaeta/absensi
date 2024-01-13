@@ -16,5 +16,6 @@ class CompanyProfile extends Model
         'address',
         'phone',
         'image',
+        'id_card'
     ];
 }

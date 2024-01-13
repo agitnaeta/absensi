@@ -26,6 +26,7 @@ class CompanyProfileRequest extends FormRequest
     {
         return [
             'image' => 'required|file|mimes:jpg,png,webp', // Adjust max size as needed
+            'id_card' => 'file|mimes:jpg,png,webp', // Adjust max size as needed
         ];
     }
 
