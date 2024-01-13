@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\UserRequest;
+use App\Models\CompanyProfile;
 use App\Models\Schedule;
 use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Prologue\Alerts\Facades\Alert;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -44,6 +46,16 @@ class UserCrudController extends CrudController
         $this->autoSetupShowOperation();
 
         $this->crud->removeColumn('schedule_id');
+        $this->crud->column([
+            'name'=>'image',
+            'label'=>'Logo Perusahaan',
+            'type'=>'custom_html',
+            'value'=>function($entry){
+                $path = "public/$entry->image";
+                $storage = Storage::url($path);
+                return "<img width='100' height='100' src='$storage' />";
+            }
+        ]);
         $this->crud->column( [
             'name' => 'schedule_id',
             'label' => 'Jadwal',
@@ -111,18 +123,8 @@ class UserCrudController extends CrudController
     {
         CRUD::setValidation(UserRequest::class);
         CRUD::setFromDb(); // set fields from db columns.
-        CRUD::field([
-            'label'=> "Jadwal",
-            'name'=>'schedule_id',
-            'type'=>'select',
-            'model'     => Schedule::class,
-            'attribute'=>'name'
-        ]);
 
-        /**
-         * Fields can be defined using the fluent syntax:
-         * - CRUD::field('price')->type('number');
-         */
+        $this->fieldModification();
     }
 
     /**
@@ -140,6 +142,10 @@ class UserCrudController extends CrudController
             (new UserRequest())->messages(),
         );
         CRUD::setFromDb(); // set fields from db columns.
+        $this->fieldModification();
+    }
+
+    function fieldModification(){
         CRUD::field([
             'Label'=> "Jadwal",
             'name'=>'schedule_id',
@@ -147,6 +153,12 @@ class UserCrudController extends CrudController
             'model'     => Schedule::class,
             'attribute'=>'name'
         ]);
+        CRUD::field('image')
+            ->type('upload')
+            ->withFiles([
+                'disk' => 'public', // the disk where file will be stored
+                'path' => 'uploads', // the path inside the disk where file will be stored
+            ]);
     }
 
     public function update()
@@ -181,8 +193,12 @@ class UserCrudController extends CrudController
 
     public function print($id){
         $user = User::find($id);
-        $pdf =  Pdf::loadView('user.detail',compact('user'))
-        ->setPaper([0,0,220,300],'p');
+        $company = CompanyProfile::find(1);
+        $userImage = Storage::path("public/$user->image");
+        $isUserImage = strlen($userImage) > 0 ;
+//        return view('user.detail',compact('user','company','userImage','isUserImage'));
+        $pdf =  Pdf::loadView('user.detail',compact('user','company','userImage','isUserImage'))
+        ->setPaper([0,0,291,463],'p');
         return $pdf->stream("sample.pdf");
     }
 }

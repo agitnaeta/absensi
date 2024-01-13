@@ -30,6 +30,7 @@ class UserRequest extends FormRequest
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string',
             'schedule_id' => 'nullable|integer', // Assuming schedule_id is an integer field
+            'image' => 'required|file|mimes:jpg,png,webp', // Adjust max size as needed
         ];
     }
     public function updateRules($userId)
@@ -43,6 +44,7 @@ class UserRequest extends FormRequest
             ],
             'password' => 'string|nullable',
             'schedule_id' => 'nullable|integer',
+            'image' => 'required|file|mimes:jpg,png,webp', // Adjust max size as needed
         ];
     }
 
@@ -77,6 +79,10 @@ class UserRequest extends FormRequest
             'password.string' => 'Kolom password harus berupa teks.',
 
             'schedule_id.integer' => 'Kolom schedule_id harus berupa angka.',
+            'image.required' => 'Silakan unggah gambar.',
+            'image.file' => 'Format file tidak valid.',
+            'image.mimes' => 'Format gambar yang diperbolehkan adalah JPG, PNG, dan WebP.',
+            'image.max' => 'Ukuran gambar tidak boleh melebihi 2MB.', // Ad
         ];
 
     }

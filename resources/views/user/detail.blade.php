@@ -1,9 +1,53 @@
-<table class="border-1">
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ID card</title>
+    <style>
+        html{
+            margin: 0;
+            padding: 0;
+        }
+        .text-center{
+            text-align: center;
+            font-size: 24px;
+        }
+        table{
+            margin-top: 20px;
+            width: 100%;
+        }
+        .mt{
+            margin-bottom: 32px;
+        }
+        body{
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: linear-gradient(45deg, #2ecc71, #3498db);;
+        }
+    </style>
+</head>
+<body>
+<table>
     <tr>
-        <td colspan="2" style="text-align: center">{{"Kartu Absensi Balqis Syar'i"}}</td>
+        <td class="text-center">{{$company->name}}</td>
     </tr>
+    @if($isUserImage)
+        <tr>
+            <td class="text-center">
+                {{--            <img src="data:image/svg+xml;base64,{{$userImage}}">--}}
+                <img  class="mt" height="150" width="150" src="{{$userImage}}">
+            </td>
+        </tr>
+    @endif
     <tr>
-        <td colspan="2">
+        <td class="text-center">
             @php
                 $base = base64_encode( QrCode::size(200)
                         ->generate($user->qr));
@@ -12,17 +56,15 @@
         </td>
     </tr>
     <tr>
-        <td colspan="2">
+        <td>
             <br>
         </td>
     </tr>
     <tr>
-        <td width="30%">Nama</td><td>: {{$user->name}}</td>
-
-    </tr>
-    <tr>
-        <td>Email</td><td>: {{$user->email}}</td>
+        <td class="text-center"> {{$user->name}}</td>
     </tr>
 </table>
+</body>
+</html>
 
 
