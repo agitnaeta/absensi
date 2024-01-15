@@ -104,7 +104,8 @@
                 <td>{{ $row->method }}</td>
             </tr>
         </table>
-        <div class="page-break"></div>
+            @if($loop->index == $recaps->count())
+                <div class="page-break"></div>
+            @endif
     @endforeach
-
 </body>
