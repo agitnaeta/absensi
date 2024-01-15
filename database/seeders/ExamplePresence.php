@@ -19,10 +19,10 @@ class ExamplePresence extends Seeder
     {
         Presence::truncate();
         SalaryRecap::truncate();
-        $users = User::with('schedule')->limit(1)->get();
+        $users = User::with('schedule')->get();
         foreach ($users as $user){
             $dateStart = Carbon::now()->startOfMonth();
-            $dateEnd = $dateStart->copy()->endOfMonth()->subDays(12);
+            $dateEnd = $dateStart->copy()->addMonths(2)->subDays(12);
             $this->inputPresence($dateStart,$dateEnd,$user);
         }
     }
