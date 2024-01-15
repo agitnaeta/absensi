@@ -10,6 +10,7 @@ use App\Models\SalaryRecap;
 use App\Models\User;
 use Carbon\Carbon;
 use Database\Factories\TranslateFactory;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class SalaryService
@@ -94,6 +95,7 @@ class SalaryService
             $abstain  = $workDayInMonth - $salaryRecap->work_day;
             return $abstain * $salary->unpaid_leave_deduction;
         }
+        return 0;
     }
 
     public function getAbstain(SalaryRecap $salaryRecap,Salary $salary){

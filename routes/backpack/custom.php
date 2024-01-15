@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\LoanCrudController;
 use App\Http\Controllers\Admin\PresenceCrudController;
+use App\Http\Controllers\Admin\SalaryRecapCrudController;
 use App\Http\Controllers\Admin\ScheduleCrudController;
 use App\Http\Controllers\Admin\UserCrudController;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +48,12 @@ Route::group([
         Route::get("/{id}/download-detail",[LoanCrudController::class,'downloadDetail'])->name('loan.download.detail');
         Route::get("/{id}/print-detail",[LoanCrudController::class,'print'])->name('loan.download.print');
         Route::get("/{id}/detail",[LoanCrudController::class,'detail'])->name('loan.detail');
+    });
+    Route::group(['prefix'=>'salary-recap'],function (){
+        Route::get('export',[SalaryRecapCrudController::class,'export'])
+            ->name('salary-recap.export');
+        Route::get('print',[SalaryRecapCrudController::class,'print'])
+            ->name('salary-recap.print');
     });
 
 

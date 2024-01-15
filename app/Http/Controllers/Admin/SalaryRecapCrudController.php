@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\SalaryRecapExport;
 use App\Http\Requests\SalaryRecapRequest;
+use App\Models\CompanyProfile;
 use App\Models\SalaryRecap;
 use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Database\Factories\TranslateFactory;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use Prologue\Alerts\Facades\Alert;
 
 /**
@@ -44,12 +50,12 @@ class SalaryRecapCrudController extends CrudController
         CRUD::setEntityNameStrings('Rekap Gaji', 'Rekap Gaji');
         $this->crud->addClause('with','user');
         $this->crud->denyAccess('create');
+        $this->crud->allowAccess(['filter_monthly','export_salary_recap']);
     }
 
 
-    protected function setupShowOperation()
+    protected function autoSetupShowOperation()
     {
-        $this->autoSetupShowOperation();
         $this->fieldModification();
     }
 
@@ -62,15 +68,24 @@ class SalaryRecapCrudController extends CrudController
     protected function setupListOperation()
     {
         CRUD::setFromDb(); // set columns from db columns.
-
+        $this->crud->set('recap_months',SalaryRecap::distinct('recap_month')->pluck('recap_month')->toArray());
+        $filter = $this->crud->getRequest()->query->get('recap_month');
+        if($filter !== null){
+            $this->crud->set('f_recap_month',$filter);
+            $this->crud->addClause('where','recap_month',$filter);
+        }
         /**
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
+
+
         $this->fieldModification();
     }
 
     public function fieldModification(){
+        $this->crud->field($this->entityField)->makeFirst();
+
         // Columns
         $columnsToRemove = [
             'user_id',
@@ -125,17 +140,37 @@ class SalaryRecapCrudController extends CrudController
         }
 
 // Order Fields
-        $this->crud->orderFields([
+        $order = [
             'user_id',
             'recap_month',
             'work_day',
             'abstain_count',
-            'late_count',
-            'late_minute_count'
-        ]);
+            'late_day',
+            'late_minute_count',
+            'salary_amount',
+            'abstain_cut',
+            'late_cut',
+            'loan_cut',
+            'received',
+            'status',
+            'desc',
+            'method',
+        ];
+        if($this->crud->getActionMethod() == "show"){
+            $this->crud->orderColumns($order);
+        }
+        $this->crud->orderFields($order);
 
 // Field order
         $this->crud->field('loan_cut')->before('received');
+
+        // add button
+        $this->crud->addButtonFromView(
+            'top',
+            'filter_monthly',
+            'filter_monthly',
+            'end'
+        );
 
     }
 
@@ -183,5 +218,37 @@ class SalaryRecapCrudController extends CrudController
         $salaryRecap->update($request->all());
         Alert::success('Berhasil Update data')->flash();
         return redirect(route('salary-recap.index'));
+    }
+
+    function export(Request $request)
+    {
+        $sr =  $request->get('salary_recap');
+        $recaps = SalaryRecap::with(['user'])
+        ->where(function ($q) use ($sr){
+            if($sr != null){
+                $q->where('recap_month', '=', $sr);
+            }
+            return $q;
+        })->get();
+        return Excel::download(new SalaryRecapExport($recaps),"recap-$sr.xlsx");
+    }
+
+    function print(Request $request)
+    {
+        $sr =  $request->get('salary_recap');
+        $recaps = SalaryRecap::with(['user'])
+            ->where(function ($q) use ($sr){
+                if($sr != null){
+                    $q->where('recap_month', '=', $sr);
+                }
+                return $q;
+            })->get();
+
+        $company = CompanyProfile::find(1);
+        $company->image = Storage::path("public/$company->image");
+        $isCompanyImage = strlen($company->image) > 0 ;
+        $pdf  = Pdf::loadView('salary-recap.print',compact('recaps','isCompanyImage','company'));
+        $pdf->setPaper([0,0,300,500],'p');
+        return $pdf->stream('rekap-gaji.pdf');
     }
 }
