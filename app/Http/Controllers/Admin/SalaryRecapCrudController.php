@@ -172,6 +172,14 @@ class SalaryRecapCrudController extends CrudController
             'end'
         );
 
+        $this->crud->allowAccess('print_salary');
+        $this->crud->addButtonFromView(
+            'line',
+            'print_salary',
+            'print_salary',
+            'end'
+        );
+
     }
 
     /**
@@ -235,11 +243,15 @@ class SalaryRecapCrudController extends CrudController
 
     function print(Request $request)
     {
+        $ui =  $request->get('id');
         $sr =  $request->get('salary_recap');
         $recaps = SalaryRecap::with(['user'])
-            ->where(function ($q) use ($sr){
+            ->where(function ($q) use ($sr,$ui){
                 if($sr != null){
-                    $q->where('recap_month', '=', $sr);
+                    $q->where('salary_recap', '=', $sr);
+                }
+                if($ui != null){
+                    $q->where('id', '=', $ui);
                 }
                 return $q;
             })->get();
