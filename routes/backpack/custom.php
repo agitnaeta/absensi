@@ -31,6 +31,7 @@ Route::group([
 
     Route::group(['prefix'=>'user'],function (){
         Route::get("/{id}/print",[UserCrudController::class,'print'])->name('user.print');
+        Route::get("/print-all",[UserCrudController::class,'printAll'])->name('user.print.all');
     });
     Route::group(['prefix'=>'presence'],function (){
         Route::get("/scan",[PresenceCrudController::class,'scan'])->name('presence.scan');
