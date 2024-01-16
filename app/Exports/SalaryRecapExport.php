@@ -5,10 +5,12 @@ namespace App\Exports;
 use App\Models\SalaryRecap;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\WithFormatData;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class SalaryRecapExport implements FromCollection, WithHeadings, WithMapping
+class SalaryRecapExport implements FromCollection, WithHeadings, WithMapping, WithColumnFormatting
 {
 
     protected $recap;
@@ -22,7 +24,24 @@ class SalaryRecapExport implements FromCollection, WithHeadings, WithMapping
     */
     public function collection()
     {
-       return $this->recap;
+        $sum = [
+            'Total',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            $this->recap->sum('salary_amount'),
+            $this->recap->sum('abstain_cut'),
+            $this->recap->sum('late_cut'),
+            $this->recap->sum('loan_cut'),
+            $this->recap->sum('received'),
+            '',
+            '',
+            ''
+        ];
+       return $this->recap->add($sum);
     }
 
     public function headings(): array
@@ -48,6 +67,9 @@ class SalaryRecapExport implements FromCollection, WithHeadings, WithMapping
 
     public function map($row): array
     {
+        if(!isset($row->user)){
+            return $row;
+        }
         return[
             $row->user->name,
             $row->recap_month,
@@ -64,6 +86,17 @@ class SalaryRecapExport implements FromCollection, WithHeadings, WithMapping
             $row->status ? 'Ya' :'Tidak',
             $row->desc,
             $row->method,
+        ];
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'H'=>'"Rp "#,##0',
+            'I'=>'"Rp "#,##0',
+            'J'=>'"Rp "#,##0',
+            'K'=>'"Rp "#,##0',
+            'L'=>'"Rp "#,##0'
         ];
     }
 }

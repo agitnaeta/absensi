@@ -29,6 +29,13 @@ class CompanyProfileRequest extends FormRequest
             'id_card' => 'file|mimes:jpg,png,webp', // Adjust max size as needed
         ];
     }
+    public function rulesUpdate()
+    {
+        return [
+            'image' => 'file|mimes:jpg,png,webp', // Adjust max size as needed
+            'id_card' => 'file|mimes:jpg,png,webp', // Adjust max size as needed
+        ];
+    }
 
     /**
      * Get the validation attributes that apply to the request.

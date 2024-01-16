@@ -238,6 +238,7 @@ class SalaryRecapCrudController extends CrudController
             }
             return $q;
         })->get();
+        
         return Excel::download(new SalaryRecapExport($recaps),"recap-$sr.xlsx");
     }
 

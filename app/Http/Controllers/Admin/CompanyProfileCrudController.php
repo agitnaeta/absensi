@@ -78,7 +78,8 @@ class CompanyProfileCrudController extends CrudController
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
-        $this->crud->removeColumn('image');
+        $this->fieldModification();
+
     }
 
     function fieldModification()
@@ -90,6 +91,11 @@ class CompanyProfileCrudController extends CrudController
         }
         $this->crud->removeField('created_at');
         $this->crud->removeField('updated_at');
+
+        if($this->crud->getCurrentOperation() == 'list'){
+            $this->crud->removeColumn('image');
+            $this->crud->removeColumn('id_card');
+        }
     }
 
     /**
@@ -132,6 +138,27 @@ class CompanyProfileCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
-        $this->setupCreateOperation();
+        CRUD::setFromDb(); // set fields from db columns.
+
+        /**
+         * Fields can be defined using the fluent syntax:
+         * - CRUD::field('price')->type('number');
+         */
+
+        CRUD::field('image')
+            ->type('upload')
+            ->withFiles([
+                'disk' => 'public', // the disk where file will be stored
+                'path' => 'uploads', // the path inside the disk where file will be stored
+            ]);
+        CRUD::field('id_card')
+            ->type('upload')
+            ->hint('Ukuran terbaik 300px X 470px')
+            ->withFiles([
+                'disk' => 'public', // the disk where file will be stored
+                'path' => 'uploads', // the path inside the disk where file will be stored
+            ]);
+        $this->fieldModification();
+        CRUD::setValidation((new CompanyProfileRequest())->rulesUpdate());
     }
 }
