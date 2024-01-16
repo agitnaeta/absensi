@@ -9,6 +9,7 @@ use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Prologue\Alerts\Facades\Alert;
@@ -109,6 +110,7 @@ class UserCrudController extends CrudController
         ]);
 
         $this->crud->addButtonFromView('line','user-print','user-print','end');
+        $this->printAllIdCard();
 
     }
 
@@ -194,14 +196,39 @@ class UserCrudController extends CrudController
         ]);
     }
 
+    public function printAllIdCard(){
+        $this->crud->allowAccess('print_id_cards');
+        $this->crud->addButtonFromView(
+            'top','print_id_cards','print_id_cards','end'
+        );
+    }
+
     public function print($id){
-        $user = User::find($id);
+        $users = User::where('id',$id)->get();
+        return $this->_print($users);
+    }
+    public function printAll(){
+        $users =  User::all();
+        return $this->_print($users);
+    }
+    private function _print(Collection $users){
+        $users->map(function ($user){
+            $user->isUserImage = strlen($user->image) > 0 ;
+            $user->image = Storage::path("public/$user->image");
+            if($user->qr){
+                $user->qr = base64_encode(QrCode::size(200)->generate($user->qr));
+            }
+        });
         $company = CompanyProfile::find(1);
-        $userImage = Storage::path("public/$user->image");
-        $company->image = Storage::path("public/$company->id_card");
-        $isUserImage = strlen($userImage) > 0 ;
-        $pdf =  Pdf::loadView('user.detail',compact('user','company','userImage','isUserImage'))
-        ->setPaper([0,0,300,470],'p');
+        if(!$company->id_card || !$company->image){
+            Alert::error("Silahkan Seting Profile Perusaan Terlebih dahulu!")->flash();
+            return redirect(route('company-profile.index'));
+        }
+        $company->image = Storage::path("public/$company->image");
+        $company->id_card = Storage::path("public/$company->id_card");
+//        return view('user.detail',compact('users','company'));
+        $pdf =  Pdf::loadView('user.detail',compact('users','company'))
+            ->setPaper([0,0,300,470],'p');
         return $pdf->stream("sample.pdf");
     }
 }
