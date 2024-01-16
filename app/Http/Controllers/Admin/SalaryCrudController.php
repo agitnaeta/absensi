@@ -142,6 +142,7 @@ class SalaryCrudController extends CrudController
         $this->crud->column('amount')->label('Gaji')->prefix('Rp.');
         $this->crud->column('overtime_amount')->label('1x Overtime')->prefix('Rp.');
         $this->crud->column('overtime_type')->label('Tipe Lembur');
+        $this->crud->column('fine_type')->label('Jenis Denda');
         $this->crud->column('unpaid_leave_deduction')->after('overtime')
             ->label('Potongan Absen');
     }
