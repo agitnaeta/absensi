@@ -70,7 +70,10 @@ class TranslateFactory extends Factory
             'out' => 'Keluar',
             'is_overtime' => 'Lembur',
             'is_late' => 'Telat',
-            'late_minute' => 'Waktu Telat(menit)',
+            'late_minute' => 'Telat(menit)',
+            'lat' => 'Latitude',
+            'lng' => 'Longitude',
+            'outside' => 'Kantor',
         ];
 
     }

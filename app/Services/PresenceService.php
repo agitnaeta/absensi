@@ -6,6 +6,7 @@ use App\Models\Presence;
 use App\Models\ScheduleDayOff;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class PresenceService
@@ -14,6 +15,15 @@ class PresenceService
     public function record(User $user){
         $time = Carbon::now(self::TIME_ZONE);
         return $this->writeRecord($user,$time);
+    }
+
+    public function updateCoordinate(Presence $presence, $lat, $lng){
+        $presence->lat = $lat;
+        $presence->lng = $lng;
+        $presence->outside = $this->inCoordinate($lat,$lng);
+        $presence->saveQuietly();
+        Log::channel('daily_log')->info($presence->toJson());
+        return $presence;
     }
 
     public function writeRecord(User $user, Carbon $time): Presence
@@ -133,5 +143,41 @@ class PresenceService
 
             }
         }
+    }
+
+    function inCoordinate($latitudeFrom, $longitudeFrom) {
+
+        $latitudeTo=(float)env('LAT');
+        $longitudeTo=(float)env("LNG");
+
+        $earthRadius = 6371000;
+        // Convert degrees to radians
+        $latFrom = deg2rad($latitudeFrom);
+        $lonFrom = deg2rad($longitudeFrom);
+        $latTo = deg2rad($latitudeTo);
+        $lonTo = deg2rad($longitudeTo);
+
+        // Calculate differences
+        $latDiff = $latTo - $latFrom;
+        $lonDiff = $lonTo - $lonFrom;
+
+        // Haversine formula
+        $a = sin($latDiff / 2) * sin($latDiff / 2) + cos($latFrom) * cos($latTo) * sin($lonDiff / 2) * sin($lonDiff / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        // Distance in meters
+        $distance = $earthRadius * $c;
+
+        Log::channel("daily_log")->info([
+            'lat'=>$latitudeFrom,
+            'lng'=>$longitudeFrom,
+            'lat2'=>$latitudeTo,
+            'lng2'=>$longitudeTo,
+            'distance'=>$distance,
+        ]);
+        if($distance <= 100){
+            return false;
+        }
+        return true;
     }
 }
