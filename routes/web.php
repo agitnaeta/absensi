@@ -15,5 +15,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+    return redirect(\route('presence.scan.public'));
+});
+Route::get('/admin', function () {
     return redirect('/admin/dashboard');
 });

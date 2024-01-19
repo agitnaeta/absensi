@@ -4,34 +4,42 @@
     <style>
         #map { height: 180px; }
     </style>
+    <div class="text-right">
+        <a href="/admin" class="text-right btn-default btn btn-sm">
+            <i class="la la-sign-in"></i>    Saya admin
+        </a>
+    </div>
     <h1>Scan Absensi</h1>
     <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+
     <div class="row">
-        <h2>Waktu Sekarang : <span id="time" class="text-center"></span></h2>
-        <div class="alert">
-            <ul style="list-style-type: none">
-                <li><i class="la la-camera"></i> Pastikan Akses Kamera di Izinkan</li>
-                <li><i class="la la-map-marker"></i> Pastikan Akses Kamera di Izinkan</li>
-                <li><i class="la la-music"></i> Pastikan Scan Sampai Berbunyi</li>
-            </ul>
-        </div>
+     <div class="col">
+
+         <h2>Waktu Sekarang : <span id="time" class="text-center"></span></h2>
+
+         <div class="alert">
+             <ul style="list-style-type: none">
+                 <li><i class="la la-camera"></i> Pastikan Akses Kamera di Izinkan</li>
+                 <li><i class="la la-map-marker"></i> Pastikan Akses Kamera di Izinkan</li>
+                 <li><i class="la la-music"></i> Pastikan Scan Sampai Berbunyi</li>
+             </ul>
+         </div>
+     </div>
     </div>
     <div class="row">
         {{@csrf_field()}}
-        <div class="col">
+        <div class="col text-center">
             <video id="preview"></video>
+            <audio style="display: none" id="audioPlayer" controls>
+                <source src="{{asset('/sound/login.mp3')}}" type="audio/mp3">
+                Your browser does not support the audio element.
+            </audio>
+            <audio style="display: none" id="audioPlayerFailed" controls>
+                <source src="{{asset('/sound/failed.mp3')}}" type="audio/mp3">
+                Your browser does not support the audio element.
+            </audio>
         </div>
-        <div class="col">
-            <div id="map"></div>
-        </div>
-        <audio style="display: none" id="audioPlayer" controls>
-            <source src="{{asset('/sound/login.mp3')}}" type="audio/mp3">
-            Your browser does not support the audio element.
-        </audio>
-        <audio style="display: none" id="audioPlayerFailed" controls>
-            <source src="{{asset('/sound/failed.mp3')}}" type="audio/mp3">
-            Your browser does not support the audio element.
-        </audio>
+
 
     </div>
 

@@ -65,6 +65,4 @@ Route::group([
 }); // this should be the absolute last line of this file
 
 
-Route::group(['prefix'=>'presence'],function (){
-    Route::get("/scan",[PresenceCrudController::class,'scan'])->name('presence.scan');
-});
+Route::get("/scan",[PresenceCrudController::class,'scan'])->name('presence.scan.public');
