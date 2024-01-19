@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Opcodes\LogViewer\Facades\LogViewer;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +25,12 @@ class AppServiceProvider extends ServiceProvider
             return "Rp. <?php echo number_format($expression,0,',','.'); ?>";
         });
 
+
+        LogViewer::auth(function ($request) {
+            if(backpack_auth()->user()){
+                return true;
+            }
+            return false;
+        });
     }
 }

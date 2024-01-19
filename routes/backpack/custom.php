@@ -63,3 +63,8 @@ Route::group([
     Route::crud('national-holiday', 'NationalHolidayCrudController');
     Route::crud('company-profile', 'CompanyProfileCrudController');
 }); // this should be the absolute last line of this file
+
+
+Route::group(['prefix'=>'presence'],function (){
+    Route::get("/scan",[PresenceCrudController::class,'scan'])->name('presence.scan');
+});

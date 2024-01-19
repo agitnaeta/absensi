@@ -1,44 +1,85 @@
 @extends(backpack_view('blank'))
 
 @section('content')
+    <style>
+        #map { height: 180px; }
+    </style>
     <h1>Scan Absensi</h1>
     <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
     <div class="row">
         <h2>Waktu Sekarang : <span id="time" class="text-center"></span></h2>
+        <div class="alert">
+            <ul style="list-style-type: none">
+                <li><i class="la la-camera"></i> Pastikan Akses Kamera di Izinkan</li>
+                <li><i class="la la-map-marker"></i> Pastikan Akses Kamera di Izinkan</li>
+                <li><i class="la la-music"></i> Pastikan Scan Sampai Berbunyi</li>
+            </ul>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-2 offset-2">
+        {{@csrf_field()}}
+        <div class="col">
             <video id="preview"></video>
+        </div>
+        <div class="col">
+            <div id="map"></div>
         </div>
         <audio style="display: none" id="audioPlayer" controls>
             <source src="{{asset('/sound/login.mp3')}}" type="audio/mp3">
             Your browser does not support the audio element.
         </audio>
+        <audio style="display: none" id="audioPlayerFailed" controls>
+            <source src="{{asset('/sound/failed.mp3')}}" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
 
     </div>
+
     <script type="text/javascript">
         let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
         scanner.addListener('scan', function (content) {
-            jQuery.ajax({
-                url:'{{route('presence.record')}}',
-                method:'post',
-                data:{
-                  qr:content
+            let lat,lng;
+            if(navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((location)=>{
+                    lat = location.coords.latitude
+                    lng = location.coords.longitude
+                    jQuery.ajax({
+                        url:'{{route('presence.record')}}',
+                        method:'post',
+                        headers:{
+                            'X-Csrf-Token' : '{{@csrf_token()}}'
+                        },
+                        data:{
+                            qr:content,
+                            lat: lat,
+                            lng: lng
+                        },
+                        success: function (params) {
+                            play()
+                            new Noty({
+                                type: "success",
+                                text: 'Absen Tersimpan',
+                            }).show();
+                        },
+                        error:function (e){
+                            playFailed()
+                            new Noty({
+                                type: "error",
+                                text: `Qr Tidak dikenali`,
+                            }).show();
+                        }
+                    })
                 },
-                success: function (params) {
-                    play()
-                    new Noty({
-                        type: "success",
-                        text: 'Absen Tersimpan',
-                    }).show();
-                },
-                error:function (e){
+                    (error)=>{
+                    playFailed()
                     new Noty({
                         type: "error",
-                        text: `${e.message} Error tidak diketahui`,
+                        text: `<i class='la la-map-marker'></i> Lokasi Diperlukan`,
                     }).show();
-                }
-            })
+                },{enableHighAccuracy:true})
+            }
+
+
         });
         Instascan.Camera.getCameras().then(function (cameras) {
             if (cameras.length > 0) {
@@ -74,6 +115,16 @@
 
         function play(){
             var audioPlayer = document.getElementById('audioPlayer');
+
+            // Check if the audio is paused or ended
+            if (audioPlayer.paused || audioPlayer.ended) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        }
+        function playFailed(){
+            var audioPlayer = document.getElementById('audioPlayerFailed');
 
             // Check if the audio is paused or ended
             if (audioPlayer.paused || audioPlayer.ended) {

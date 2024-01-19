@@ -17,6 +17,9 @@ class Presence extends Model
         'is_overtime',
         'is_late',
         'late_minute',
+        'lat',
+        'lng',
+        'outside',
     ];
 
     protected $guarded =[];

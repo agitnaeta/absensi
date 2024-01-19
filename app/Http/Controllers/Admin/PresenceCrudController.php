@@ -51,13 +51,13 @@ class PresenceCrudController extends CrudController
 
     protected function autoSetupShowOperation()
     {
+        CRUD::setFromDb();
         $this->fieldModification();
     }
 
     protected function setupShowOperation()
     {
         $this->autoSetupShowOperation();
-        $this->crud->addColumn($this->entityField)->beforeColumn('in');
         $this->fieldModification();
     }
 
@@ -82,13 +82,25 @@ class PresenceCrudController extends CrudController
     }
 
     public function fieldModification(){
+        $this->crud->removeColumn('user_id');
+        $this->crud->addColumn($this->entityField)->beforeColumn('in');
+
         $translate = new TranslateFactory();
         foreach($translate->presences() as $key => $value){
             $this->crud->field($key)->label($value);
             $this->crud->column($key)->label($value);
         }
-        $this->crud->removeField('created_at');
-        $this->crud->removeField('updated_at');
+
+        $fieldsToRemove = ['created_at', 'updated_at','lat','lng'];
+
+        if($this->crud->getCurrentOperation() !='show'){
+            foreach ($fieldsToRemove as $field) {
+                $this->crud->removeField($field);
+                $this->crud->removeColumn($field);
+            }
+        }
+
+
     }
 
     /**
@@ -158,7 +170,11 @@ class PresenceCrudController extends CrudController
         if($request->qr){
             $user = User::with('schedule')
                 ->where("qr",$request->qr)->first();
+            if(!$user){
+                return response()->json('Failed',500);
+            }
             $p = (new PresenceService())->record($user);
+            (new PresenceService())->updateCoordinate($p,$request->lat, $request->lng);
             return response()->json($p);
         }
         return response()->json("Not Found",404);
