@@ -44,7 +44,7 @@ class UserRequest extends FormRequest
             ],
             'password' => 'string|nullable',
             'schedule_id' => 'nullable|integer',
-            'image' => 'required|file|mimes:jpg,png,webp', // Adjust max size as needed
+            'image' => 'file|mimes:jpg,png,webp', // Adjust max size as needed
         ];
     }
 

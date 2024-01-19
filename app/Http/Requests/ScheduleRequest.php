@@ -30,7 +30,6 @@ class ScheduleRequest extends FormRequest
             'out' => 'required',
             'over_in' => 'required',
             'over_out' => 'required',
-            'fine_per_minute' => 'required|integer',
             'day_off' => 'required',
         ];
     }

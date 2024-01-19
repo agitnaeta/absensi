@@ -175,6 +175,11 @@ class UserCrudController extends CrudController
         }
         else{
             unset($request['password']);
+
+        }
+
+        if(!isset($request['image'])){
+            unset($request['image']);
         }
         $user->update($request);
         Alert::success("<strong>Success</strong><br> Berhasil Update data")->flash();
