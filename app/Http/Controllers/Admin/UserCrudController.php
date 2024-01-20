@@ -49,7 +49,7 @@ class UserCrudController extends CrudController
         $this->crud->removeColumn('schedule_id');
         $this->crud->column([
             'name'=>'image',
-            'label'=>'Logo Perusahaan',
+            'label'=>'Foto Karyawan',
             'type'=>'custom_html',
             'value'=>function($entry){
                 $path = "public/$entry->image";
