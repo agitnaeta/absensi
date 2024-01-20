@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\UserExport;
 use App\Http\Requests\UserRequest;
 use App\Models\CompanyProfile;
 use App\Models\Schedule;
@@ -12,6 +13,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use Prologue\Alerts\Facades\Alert;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -110,7 +112,10 @@ class UserCrudController extends CrudController
         ]);
 
         $this->crud->addButtonFromView('line','user-print','user-print','end');
+        $this->crud->allowAccess("user_export");
+        $this->crud->addButtonFromView('top','user_export','user_export','end');
         $this->printAllIdCard();
+
 
     }
 
@@ -235,5 +240,9 @@ class UserCrudController extends CrudController
         $pdf =  Pdf::loadView('user.detail',compact('users','company'))
             ->setPaper([0,0,300,470],'p');
         return $pdf->stream("sample.pdf");
+    }
+
+    public function export(){
+        return Excel::download(new UserExport,'user-export.xlsx');
     }
 }
