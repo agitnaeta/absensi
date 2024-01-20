@@ -41,6 +41,11 @@
         .block-image > img.company{
             border-radius: 8px;
         }
+        .block-image > img.profile{
+            height: 150px;
+            min-height: 150px;
+            overflow: hidden;
+        }
 
         .page-break {
             page-break-before: always;
@@ -61,7 +66,7 @@
         <tr>
             <td class="text-center block-image">
                 @if($user->isUserImage)
-                    <img class="mt" height="150" width="150" src="{{ $user->image }}">
+                    <img class="mt profile" src="{{ $user->image }}">
                 @endif
             </td>
         </tr>
