@@ -221,7 +221,7 @@ class UserCrudController extends CrudController
             $user->isUserImage = strlen($user->image) > 0 ;
             $user->image = Storage::path("public/$user->image");
             if($user->qr){
-                $user->qr = base64_encode(QrCode::size(200)->generate($user->qr));
+                $user->qr = base64_encode(QrCode::size(150)->generate($user->qr));
             }
         });
         $company = CompanyProfile::find(1);

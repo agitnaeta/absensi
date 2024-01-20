@@ -11,14 +11,12 @@
             margin: 0;
             padding: 0;
         }
-
         .text-center {
             text-align: center;
-            font-size: 24px;
+            font-size: 18px;
         }
-
         table {
-            margin-top: 38px;
+            margin-top: 20px;
             width: 100%;
         }
 
@@ -40,6 +38,9 @@
         .block-image {
             min-height: 150px;
         }
+        .block-image > img.company{
+            border-radius: 8px;
+        }
 
         .page-break {
             page-break-before: always;
@@ -50,8 +51,10 @@
 @foreach($users as $user)
     <table>
         <tr>
-            <td class="text-center">
-                {{ $company->name }}
+            <td class="text-center block-image">
+                @if($company->image)
+                    <img class="mt company" height="100" width="100" src="{{ $company->image }}">
+                @endif
             </td>
         </tr>
 
@@ -73,6 +76,9 @@
 
         <tr>
             <td class="text-center"> {{ $user->name }}</td>
+        </tr>
+        <tr>
+            <td class="text-center"> ({{ $company->name }})</td>
         </tr>
     </table>
 
