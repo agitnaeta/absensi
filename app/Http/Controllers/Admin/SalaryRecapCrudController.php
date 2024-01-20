@@ -266,7 +266,7 @@ class SalaryRecapCrudController extends CrudController
         $company->image = Storage::path("public/$company->image");
         $isCompanyImage = strlen($company->image) > 0 ;
         $pdf  = Pdf::loadView('salary-recap.print',compact('recaps','isCompanyImage','company'));
-        $pdf->setPaper([0,0,300,500],'p');
+        $pdf->setPaper([0,0,350,500],'P');
         return $pdf->stream('rekap-gaji.pdf');
     }
 }
