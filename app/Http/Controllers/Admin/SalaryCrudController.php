@@ -132,6 +132,7 @@ class SalaryCrudController extends CrudController
             ->label('Denda Per-Menit')
             ->prefix('Rp.');
 
+        $this->crud->removeColumn('fine');
         $this->crud->removeColumn('user_id');
         $this->crud->addColumn($this->entityField)->makeFirstColumn();
         // kolom
