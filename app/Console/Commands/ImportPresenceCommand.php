@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Imports\PresenceImport;
+use App\Models\Presence;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -32,19 +34,49 @@ class ImportPresenceCommand extends Command
         $data = IOFactory::load($storagePath,0,[
             IOFactory::READER_XLSX
         ])->getActiveSheet()->toArray();
-        $dataCollection = collect($data);
-        $monthCollection = collect();
-        $dataCollection->map(function ($presences) use ($monthCollection) {
-            $presences = collect($presences);
-            $dayCollection = collect(['name'=>$presences[0],'login'=>collect()]);
-            $presences->each(function ($value,$key) use($dayCollection){
-                if ($key % 2 == 0) {
-                    $dayCollection['login']->push(['masuk']);
-                    $this->info("Item at index $key: $value\n");
+
+        $data = collect($data);
+        $data->map(function ($value){
+            $presences = collect($value);
+            $carbon = Carbon::now()->startOfMonth();
+            $presences->each(function ($v,$i) use($presences,$carbon){
+                if($i != 0 && $i %2!==0 ){
+                  $value = $v + $presences[$i+1];
+                  $day =$carbon->addDay();
+                  $this->import($day,$presences[0],$value);
                 }
             });
-            $monthCollection->push($dayCollection);
         });
 
+    }
+
+    public function import(Carbon $start, string $userId,  $value){
+        $start = $start->copy()->subDay();
+        if($value < 1){
+            return false;
+        }
+        $hourIn = Carbon::createFromTime(8,0);
+        $hourOut = Carbon::createFromTime(17,0);
+
+        $oldRecord = Presence::where('user_id',$userId)
+            ->whereDate('in',$start)
+            ->first();
+        if($oldRecord!=null){
+            $oldRecord->delete();
+        }
+
+        $presence = new Presence();
+        $presence->user_id = $userId;
+        $presence->in = $start->setTimeFrom($hourIn)->format("Y-m-d H:i:s");
+
+        $out = $start->copy()->setTimeFrom($hourOut);
+        if($value > 1){
+            $presence->out = $out->addHours(2)->format('Y-m-d H:i:s');
+        }else{
+            $presence->out = $out->format("Y-m-d H:i:s");
+        }
+
+        $this->info($presence->toJson());
+        $presence->save();
     }
 }

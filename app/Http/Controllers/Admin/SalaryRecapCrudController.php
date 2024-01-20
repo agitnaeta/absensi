@@ -7,6 +7,7 @@ use App\Http\Requests\SalaryRecapRequest;
 use App\Models\CompanyProfile;
 use App\Models\SalaryRecap;
 use App\Models\User;
+use App\Services\SalaryService;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -238,7 +239,7 @@ class SalaryRecapCrudController extends CrudController
             }
             return $q;
         })->get();
-        
+
         return Excel::download(new SalaryRecapExport($recaps),"recap-$sr.xlsx");
     }
 
@@ -256,6 +257,10 @@ class SalaryRecapCrudController extends CrudController
                 }
                 return $q;
             })->get();
+        $recaps->map(function ($recap){
+            $recap->work_in_month = (new SalaryService())->workdayInAMonth($recap);
+            return $recap;
+        });
 
         $company = CompanyProfile::find(1);
         $company->image = Storage::path("public/$company->image");

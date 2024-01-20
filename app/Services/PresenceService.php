@@ -87,6 +87,9 @@ class PresenceService
         $user = User::with('schedule')
                     ->where('id',$presence->user_id)
                     ->first();
+        if(!isset($user->schedule)){
+            return false;
+        }
 
         if($presence->in !== null){
             // catatan waktu masuk
@@ -119,6 +122,9 @@ class PresenceService
                     ->where('id',$presence->user_id)
                     ->first();
 
+        if(!isset($user->schedule)){
+            return false;
+        }
         $presenceIn = Carbon::parse($presence->in,self::TIME_ZONE);
         if ($this->checkIfOffDay($user, $presenceIn)){
             $presence->is_overtime = true;

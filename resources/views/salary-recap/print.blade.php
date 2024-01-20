@@ -14,7 +14,7 @@
             border: 1px solid #ddd;
         }
         table{
-            margin-top: 38px;
+            margin-top: 20px;
             width: 100%;
             border: 1px solid #73818f;
         }
@@ -52,11 +52,11 @@
             </tr>
             <tr>
                 <td>Hari Kerja</td>
-                <td>{{ $row->work_day }}</td>
+                <td>{{ $row->work_day }} Hari, Dari {{$row->work_in_month}} </td>
             </tr>
             <tr>
                 <td>Jumlah Absen</td>
-                <td>{{ $row->abstain_count }}</td>
+                <td>{{ $row->abstain_count }} Hari</td>
             </tr>
             <tr>
                 <td>Hari Terlambat</td>
@@ -73,6 +73,10 @@
             <tr>
                 <td>Jumlah Gaji</td>
                 <td>@rupiah($row->salary_amount)</td>
+            </tr>
+            <tr>
+                <td>Lembur</td>
+                <td>@rupiah($row->overtime_amount)</td>
             </tr>
             <tr>
                 <td>Potongan Absen</td>

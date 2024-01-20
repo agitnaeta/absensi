@@ -34,6 +34,9 @@ class SalaryService
 
     protected function getSalaryRecapRecords(Presence $presence){
         $user = User::find($presence->user_id);
+        if($user==null){
+            return false;
+        }
         $salaryRecap = SalaryRecap::where('user_id',$user->id)
                                   ->where('recap_month',$this->recapMonth($presence))
                                   ->first();
