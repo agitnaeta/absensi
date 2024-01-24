@@ -13,3 +13,7 @@
     /* Add any additional styles you want for the disabled input */
     pointer-events: none;
 }
+.company-logo{
+    width: 100px;
+    height: auto;
+}

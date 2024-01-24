@@ -45,7 +45,7 @@ class CompanyProfileCrudController extends CrudController
             'value'=>function($entry){
                  $path = "public/$entry->image";
                  $storage = Storage::url($path);
-                 return "<img width='100' height='100' src='$storage' />";
+                 return "<img class='company-logo' src='$storage' />";
             }
 
         ]);

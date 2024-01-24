@@ -30,6 +30,9 @@
             margin-right: auto;
             display: block;
             text-align: center;
+            overflow: hidden;
+            width: 100px;
+            height: auto;
         }
     </style>
 </head>
@@ -37,7 +40,7 @@
     @foreach($recaps as $row)
             <div class="logo">
                @if($isCompanyImage)
-                    <img height="100" width="100" src="{{$company->image}}"/>
+                    <img class="company-logo" src="{{$company->image}}"/>
                 @endif
                 <p>{{$company->name}}</p>
             </div>
