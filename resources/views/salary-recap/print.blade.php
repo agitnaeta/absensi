@@ -32,7 +32,7 @@
             text-align: center;
             overflow: hidden;
             width: 100px;
-            height: auto;
+            height: 100px;
         }
     </style>
 </head>
