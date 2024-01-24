@@ -25,6 +25,14 @@ class PresenceService
         Log::channel('daily_log')->info($presence->toJson());
         return $presence;
     }
+    public function recalCulateCoordinate(Presence $presence){
+        if(isset($presence->lat) && isset($presence->lng)){
+            $presence->outside = $this->inCoordinate($presence->lat,$presence->lng);
+            $presence->saveQuietly();
+            Log::channel('daily_log')->info($presence->toJson());
+            return $presence;
+        }
+    }
 
     public function writeRecord(User $user, Carbon $time): Presence
     {
@@ -106,12 +114,12 @@ class PresenceService
             $scheduleIn = $presenceIn->copy()->setTimeFrom($timeIn);
 
             if($scheduleIn->lessThan($presenceIn)){
-                $presence->is_late = true;
                 $presence->late_minute = $scheduleIn->diffInMinutes($presenceIn);
+                $presence->is_late = $presence->late_minute == 0 ? false : true;
                 $presence->saveQuietly();
             }else{
                 $presence->is_late = false;
-                $presence->late_minute = $scheduleIn->diffInMinutes($presenceIn);
+                $presence->late_minute = 0;
                 $presence->saveQuietly();
             }
         }
@@ -146,7 +154,9 @@ class PresenceService
             if($presenceOut->greaterThan($scheduleOverIn)){
                 $presence->is_overtime = true;
                 return $presence->saveQuietly();
-
+            }else{
+                $presence->is_overtime = false;
+                return $presence->saveQuietly();
             }
         }
     }

@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\Presence;
 use App\Services\PresenceService;
 use App\Services\SalaryService;
+use Illuminate\Support\Facades\Log;
 
 class PresenceObserver
 {
@@ -35,6 +36,7 @@ class PresenceObserver
         // Calculate Late
         $this->presenceService->calculateLate($presence);
         $this->presenceService->calculateOvertime($presence);
+        $this->presenceService->recalCulateCoordinate($presence);
         $this->salaryService->recap($presence);
     }
 
