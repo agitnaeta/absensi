@@ -31,8 +31,12 @@
             display: block;
             text-align: center;
             overflow: hidden;
-            width: 100px;
+            width: 150px;
             height: 100px;
+        }
+        .logo > .company-logo{
+            height: auto;
+            width: 150px;
         }
     </style>
 </head>
