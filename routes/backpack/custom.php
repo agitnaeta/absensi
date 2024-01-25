@@ -67,3 +67,6 @@ Route::group([
 
 
 Route::get("/scan",[PresenceCrudController::class,'scan'])->name('presence.scan.public');
+Route::group(['prefix'=>'presence'],function (){
+    Route::post("/record",[PresenceCrudController::class,'record'])->name('presence.record');
+});
