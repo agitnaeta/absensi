@@ -202,10 +202,12 @@ class PresenceService
             ->first();
 
         $scheduleOut = Carbon::parse($user->schedule->out,self::TIME_ZONE);
+        $overtimeStart = Carbon::parse($user->schedule->over_in,self::TIME_ZONE);
         $logout = Carbon::parse($presence->out,self::TIME_ZONE);
         if($logout->gt($scheduleOut)){
+            $maxDiff = $scheduleOut->diffInMinutes($overtimeStart);
             $diff = $logout->diffInMinutes($scheduleOut);
-            $presence->extra_time = $diff > 60 ? 60 : $diff;
+            $presence->extra_time = $diff > $maxDiff ? $maxDiff : $diff;
             $presence->saveQuietly();
         }
     }
