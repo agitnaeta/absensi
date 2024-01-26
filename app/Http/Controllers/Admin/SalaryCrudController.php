@@ -47,7 +47,8 @@ class SalaryCrudController extends CrudController
     protected function setupShowOperation()
     {
         $this->autoSetupShowOperation();
-        $this->crud->addColumn($this->entityField)->beforeColumn('amount');
+        CRUD::setFromDB();
+        $this->fieldModification();
     }
 
     /**
@@ -90,11 +91,6 @@ class SalaryCrudController extends CrudController
     public function fieldModification(){
 
         $this->crud->field($this->entityField)->beforeColumn('amount');
-
-        $this->crud->field('fine')
-            ->prefix('Rp.')
-            ->after('fine_per_minute')
-            ->label('Besaran Denda Telat - Flat');
         $this->crud->field(
             [
                 'name'        => 'overtime_type',
@@ -106,6 +102,7 @@ class SalaryCrudController extends CrudController
                 ]
             ]
         );
+
         $this->crud->field(
             [
                 'name'        => 'fine_type',
@@ -119,33 +116,50 @@ class SalaryCrudController extends CrudController
             ]
         );
 
-        $this->crud->field('unpaid_leave_deduction')
-            ->label('Besaran Potongan Absen')
-            ->prefix('Rp');
-        $this->crud->field('amount')
-            ->label('Besaran Gaji')
-            ->prefix('Rp');
-        $this->crud->field('overtime_amount')
-            ->label('Besaran 1x Lembur')
-            ->prefix('Rp');
-        $this->crud->field('fine_per_minute')
-            ->label('Denda Per-Menit')
-            ->prefix('Rp.');
+        $fields = [
+            'unpaid_leave_deduction' => ['Besaran Potongan Absen', 'Rp'],
+            'amount' => ['Besaran Gaji', 'Rp'],
+            'overtime_amount' => ['Besaran 1x Lembur', 'Rp'],
+            'fine_per_minute' => ['Denda Per-Menit', 'Rp.'],
+            'fine' => ['Besaran Denda Telat - Flat', 'Rp.'],
+            'extra_time' => ['Besaran lebih waktu (per-menit)', 'Rp.'],
+            'extra_time_rule' => ['Aturan Lebih Waktu', ''],
+        ];
 
-        $this->crud->removeColumn('fine');
+        foreach ($fields as $fieldName => [$label, $prefix]) {
+            $this->crud->field($fieldName)
+                ->label($label)
+                ->prefix($prefix);
+        }
+
+
+
+        // kolom
         $this->crud->removeColumn('user_id');
         $this->crud->addColumn($this->entityField)->makeFirstColumn();
-        // kolom
-        $this->crud->column('fine_per_minute')
-            ->makeLast()
-            ->label('Denda Per-Menit')
-            ->prefix('Rp.');
-        $this->crud->column('amount')->label('Gaji')->prefix('Rp.');
-        $this->crud->column('overtime_amount')->label('1x Overtime')->prefix('Rp.');
-        $this->crud->column('overtime_type')->label('Tipe Lembur');
-        $this->crud->column('fine_type')->label('Jenis Denda');
-        $this->crud->column('unpaid_leave_deduction')->after('overtime')
-            ->label('Potongan Absen');
+
+        $fields = [
+            'amount' => ['Gaji', 'Rp.',2],
+            'overtime_amount' => ['1x Lembur', 'Rp.',3],
+            'overtime_type' => ['Tipe Lembur', '',4],
+            'fine_type' => ['Jenis Denda', '',5],
+            'fine_per_minute' => ['Denda Per-Menit', 'Rp.',6],
+            'fine' => ['Denda Flat','Rp.',7],
+            'unpaid_leave_deduction' => ['Potongan Absen', 'Rp.',8],
+            'extra_time' => ['Besaran lebih waktu (per-menit)', 'Rp.',9],
+            'extra_time_rule' => ['Aturan Lebih Waktu', '',10],
+        ];
+
+        foreach ($fields as $fieldName => [$label, $prefix,$prior]) {
+            $this->crud->column($fieldName)
+                ->label($label)
+                ->priority($prior)
+                ->prefix($prefix);
+        }
+        if($this->crud->getCurrentOperation() != 'show'){
+            $this->crud->removeColumn('fine');
+        }
+
     }
 
     public function autoSetupShowOperation()

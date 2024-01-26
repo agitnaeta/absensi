@@ -49,6 +49,8 @@ class TranslateFactory extends Factory
             'method' => 'Metode Pembayaran',
             'desc' => 'Keterangan',
             'late_minute_count' => 'Menit Telat',
+            'extra_time' => 'Lebih Waktu (menit)',
+            'extra_time_amount' => 'Bonus Lebih Waktu',
         ];
     }
 
@@ -74,6 +76,7 @@ class TranslateFactory extends Factory
             'lat' => 'Latitude',
             'lng' => 'Longitude',
             'outside' => 'Kantor',
+            'extra_time' => 'Lebih Waktu(menit)',
         ];
 
     }

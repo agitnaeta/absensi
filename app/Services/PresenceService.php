@@ -196,4 +196,17 @@ class PresenceService
         }
         return true;
     }
+    public function calculateExtraTime(Presence $presence){
+        $user = User::with('schedule')
+            ->where('id',$presence->user_id)
+            ->first();
+
+        $scheduleOut = Carbon::parse($user->schedule->out,self::TIME_ZONE);
+        $logout = Carbon::parse($presence->out,self::TIME_ZONE);
+        if($logout->gt($scheduleOut)){
+            $diff = $logout->diffInMinutes($scheduleOut);
+            $presence->extra_time = $diff > 60 ? 60 : $diff;
+            $presence->saveQuietly();
+        }
+    }
 }

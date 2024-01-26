@@ -14,8 +14,8 @@
             border: 1px solid #ddd;
         }
         table{
-            margin-top: 20px;
             width: 100%;
+            font-size: smaller;
             border: 1px solid #73818f;
         }
         .mt{
@@ -31,12 +31,16 @@
             display: block;
             text-align: center;
             overflow: hidden;
-            width: 150px;
-            height: 100px;
+            width: 80px;
+            height: 50px;
         }
         .logo > .company-logo{
             height: auto;
-            width: 150px;
+            width: 80px;
+        }
+        .text-heading{
+            text-align: left;
+            font-weight:bolder ;
         }
     </style>
 </head>
@@ -73,9 +77,20 @@
                 <td>Total Menit Terlambat</td>
                 <td>{{ $row->late_minute_count }}</td>
             </tr>
+            @if($row->user->salary->extra_time_rule == 1)
+            <tr>
+                <td>Total Menit Lebih</td>
+                <td>{{ $row->extra_time }}</td>
+            </tr>
+            @endif
             <tr>
                 <td>Jenis Denda</td>
                 <td>{{ isset($row->user->salary->fine_type) ? $row->user->salary->fine_type : '' }}</td>
+            </tr>
+            <tr>
+                <td colspan="2" class="text-heading">
+                    Gaji & Tambahan
+                </td>
             </tr>
             <tr>
                 <td>Jumlah Gaji</td>
@@ -84,6 +99,17 @@
             <tr>
                 <td>Lembur</td>
                 <td>@rupiah($row->overtime_amount)</td>
+            </tr>
+            @if($row->user->salary->extra_time_rule == 1)
+            <tr>
+                <td>Tambahan Waktu</td>
+                <td>@rupiah($row->extra_time_amount)</td>
+            </tr>
+            @endif
+            <tr>
+                <td class="text-heading" colspan="2">
+                    Potongan & Denda
+                </td>
             </tr>
             <tr>
                 <td>Potongan Absen</td>
@@ -98,10 +124,14 @@
                 <td>@rupiah($row->loan_cut)</td>
             </tr>
             <tr>
+                <td colspan="2" class="text-heading">
+                    Besaran Final & Status
+                </td>
+            </tr>
+            <tr>
                 <td>Diterima</td>
                 <td>@rupiah($row->received)</td>
             </tr>
-
             <tr>
                 <td>Status Dibayar</td>
                 <td>{{ $row->status ? 'Ya' : 'Belum' }}</td>
