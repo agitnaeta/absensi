@@ -16,7 +16,7 @@ class RecalculatePresence extends Seeder
     {
         $presences = Presence::all();
         $presences->map(function ($presence){
-            $presence->outside = true;
+            $presence->outside = false;
             $presence->save();
         });
 
