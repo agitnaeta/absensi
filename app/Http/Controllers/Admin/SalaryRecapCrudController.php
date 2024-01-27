@@ -247,7 +247,9 @@ class SalaryRecapCrudController extends CrudController
     {
         $ui =  $request->get('id');
         $sr =  $request->get('salary_recap');
-        $recaps = SalaryRecap::with(['user'])
+        $recaps = SalaryRecap::with(['user'=>function($u){
+            $u->with('salary');
+        }])
             ->where(function ($q) use ($sr,$ui){
                 if($sr != null){
                     $q->where('salary_recap', '=', $sr);
@@ -261,7 +263,6 @@ class SalaryRecapCrudController extends CrudController
             $recap->work_in_month = (new SalaryService())->workdayInAMonth($recap);
             return $recap;
         });
-
         $company = CompanyProfile::find(1);
         $company->image = Storage::path("public/$company->image");
         $isCompanyImage = strlen($company->image) > 0 ;

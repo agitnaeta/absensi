@@ -20,6 +20,7 @@ class Presence extends Model
         'lat',
         'lng',
         'outside',
+        'extra_time',
     ];
 
     protected $guarded =[];

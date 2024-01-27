@@ -12,7 +12,7 @@ class Salary extends Model
     use HasFactory;
     protected $fillable = [
         'user_id', 'amount', 'overtime_amount', 'overtime_type','unpaid_leave_deduction',
-        'fine_per_minute','fine_type','fine'
+        'fine_per_minute','fine_type','fine','extra_time','extra_time_rule'
     ];
 
     public function user(){

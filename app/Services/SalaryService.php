@@ -78,11 +78,13 @@ class SalaryService
         $salaryRecap->abstain_count = $this->getAbstain($salaryRecap,$salary);
         $salaryRecap->late_minute_count = $presence->sum('late_minute');
         $salaryRecap->late_cut = $this->deductSalaryByLate($salaryRecap);
+        $salaryRecap->extra_time = $presence->sum('extra_time');
+        $salaryRecap->extra_time_amount = $this->calculateExtraTimeAmount($salaryRecap);
         $salaryRecap->received = $salaryRecap->salary_amount +
             $salaryRecap->overtime_amount -
             $salaryRecap->loan_cut -
             $salaryRecap->abstain_cut -
-            $salaryRecap->late_cut;
+            $salaryRecap->late_cut + $salaryRecap->extra_time_amount;
 
         $salaryRecap->saveQuietly();
 
@@ -196,6 +198,14 @@ class SalaryService
         {
             return $user->salary->fine * $salaryRecap->late_day;
         }
+    }
+    public function calculateExtraTimeAmount($salaryRecap){
+        // Extra time x salary extra time
+        $user = User::with('salary')->find($salaryRecap->user_id);
+        if($user->salary->extra_time_rule == 1){
+            return $user->salary->extra_time * $salaryRecap->extra_time;
+        }
+        return 0;
     }
 
 }

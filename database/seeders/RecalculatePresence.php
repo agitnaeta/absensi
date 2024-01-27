@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Presence;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
@@ -14,9 +15,12 @@ class RecalculatePresence extends Seeder
      */
     public function run(): void
     {
-        $presences = Presence::all();
+        $now = Carbon::now();
+        $presences = Presence::whereMonth("created_at",$now->month)
+            ->whereYear("created_at",$now->year)
+            ->get();
         $presences->map(function ($presence){
-            $presence->outside = true;
+            $presence->outside = false;
             $presence->save();
         });
 

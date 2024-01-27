@@ -24,6 +24,7 @@ class PresenceObserver
         // Calculate Late
         $this->presenceService->calculateLate($presence);
         $this->presenceService->calculateOvertime($presence);
+        $this->presenceService->calculateExtraTime($presence);
         $this->salaryService->recap($presence);
     }
 
@@ -36,6 +37,7 @@ class PresenceObserver
         // Calculate Late
         $this->presenceService->calculateLate($presence);
         $this->presenceService->calculateOvertime($presence);
+        $this->presenceService->calculateExtraTime($presence);
         $this->presenceService->recalCulateCoordinate($presence);
         $this->salaryService->recap($presence);
     }
