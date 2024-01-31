@@ -8,6 +8,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Cetak Gaji</title>
     <style>
+        body{
+            margin-top: 10px;
+        }
         table,
         th,
         td {

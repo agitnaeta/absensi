@@ -252,7 +252,7 @@ class SalaryRecapCrudController extends CrudController
         }])
             ->where(function ($q) use ($sr,$ui){
                 if($sr != null){
-                    $q->where('salary_recap', '=', $sr);
+                    $q->where('recap_month', '=', $sr);
                 }
                 if($ui != null){
                     $q->where('id', '=', $ui);
