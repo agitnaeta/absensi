@@ -57,6 +57,7 @@ class SalaryRecapCrudController extends CrudController
 
     protected function autoSetupShowOperation()
     {
+        CRUD::setFromDb();
         $this->fieldModification();
     }
 
@@ -153,7 +154,7 @@ class SalaryRecapCrudController extends CrudController
             'late_cut',
             'loan_cut',
             'received',
-            'status',
+            'paid',
             'desc',
             'method',
         ];

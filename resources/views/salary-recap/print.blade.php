@@ -137,7 +137,7 @@
             </tr>
             <tr>
                 <td>Status Dibayar</td>
-                <td>{{ $row->status ? 'Ya' : 'Belum' }}</td>
+                <td>{{ $row->paid ? 'Sudah Dibayar' : 'Belum' }}</td>
             </tr>
             <tr>
                 <td>Keterangan</td>
