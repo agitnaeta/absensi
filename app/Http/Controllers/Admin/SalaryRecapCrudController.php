@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Exports\SalaryRecapExport;
+use App\Http\Controllers\Admin\Operations\SetPaymentOperation;
 use App\Http\Requests\SalaryRecapRequest;
 use App\Models\CompanyProfile;
 use App\Models\SalaryRecap;
@@ -16,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Prologue\Alerts\Facades\Alert;
+use function Symfony\Component\Translation\t;
 
 /**
  * Class SalaryRecapCrudController
@@ -29,7 +31,7 @@ class SalaryRecapCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
-
+    use SetPaymentOperation;
     protected $entityField = [
         'name'=>'user_id',
         'entity'=>'user',
@@ -37,6 +39,12 @@ class SalaryRecapCrudController extends CrudController
         'attribute'=>'name',
         'type'=>'select',
         'label'=>'Nama Karyawan'
+    ];
+    protected $transferStatus = [
+        'name'=>'paid_status',
+        'type'=>'model_function',
+        'function_name'=>'getPaidStatusAttribute',
+        'label'=>'Status Bayar',
     ];
 
     /**
@@ -70,6 +78,7 @@ class SalaryRecapCrudController extends CrudController
     protected function setupListOperation()
     {
         CRUD::setFromDb(); // set columns from db columns.
+        CRUD::setOperationSetting('lineButtonsAsDropdown', true);
         $this->crud->set('recap_months',SalaryRecap::distinct('recap_month')->pluck('recap_month')->toArray());
         $filter = $this->crud->getRequest()->query->get('recap_month');
         if($filter !== null){
@@ -98,16 +107,16 @@ class SalaryRecapCrudController extends CrudController
             'abstain_cut',
             'created_at',
             'received_at',
-            'updated_at'
+            'updated_at',
+            'desc'
         ];
         $this->crud->removeColumns($columnsToRemove);
-        $this->crud->addColumn($this->entityField)->afterColumn('recap_month');
-        $columns = array_merge([$this->entityField], $this->crud->columns());
-        $this->crud->setColumns($columns);
+        $this->crud->addColumn($this->entityField)->beforeColumn('recap_month');
+        $this->crud->addColumn($this->transferStatus)->beforeColumn('recap_month');
 
 // Buttons
         if ($this->crud->getCurrentOperation() != 'show') {
-            $this->crud->removeButtons(['delete', 'update']);
+            $this->crud->removeButtons(['delete']);
         }
 
 // Form fields
@@ -161,6 +170,7 @@ class SalaryRecapCrudController extends CrudController
         if($this->crud->getActionMethod() == "show"){
             $this->crud->orderColumns($order);
         }
+
         $this->crud->orderFields($order);
 
 // Field order
@@ -181,6 +191,8 @@ class SalaryRecapCrudController extends CrudController
             'print_salary',
             'end'
         );
+
+
 
     }
 
