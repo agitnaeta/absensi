@@ -34,6 +34,7 @@ class SalaryRequest extends FormRequest
             'amount' => 'required|integer',
             'overtime_amount' => 'required|integer',
             'overtime_type' => 'required|in:flat,hour',
+            'fine_type' => 'required',
         ];
     }
     public function rulesUpdate($userId): array
@@ -47,6 +48,7 @@ class SalaryRequest extends FormRequest
             'amount' => 'required|integer',
             'overtime_amount' => 'required|integer',
             'overtime_type' => 'required|in:flat,hour',
+            'fine_type' => 'required',
         ];
     }
 
@@ -81,6 +83,7 @@ class SalaryRequest extends FormRequest
             'overtime_amount.integer' => 'Kolom overtime amount harus berupa bilangan bulat.',
             'overtime_type.required' => 'Kolom overtime type harus diisi.',
             'overtime_type.in' => 'Kolom overtime type harus salah satu dari: :values.',
+            'fine_type.required' => 'Jenis denda harus di isi.',
         ];
     }
 }

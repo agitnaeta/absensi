@@ -108,6 +108,7 @@ class SalaryCrudController extends CrudController
                 'name'        => 'fine_type',
                 'label'       => 'Jenis Denda Telat',
                 'type'        => 'radio',
+                'required' => true,
                 'options'=>[
                         'minute' => 'Per-Menit',
                         'flat' => 'Flat',
