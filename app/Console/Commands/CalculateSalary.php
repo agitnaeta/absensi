@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Services\SalaryService;
+use App\Models\SalaryRecap;
 use Illuminate\Console\Command;
 
 class CalculateSalary extends Command
@@ -25,6 +27,10 @@ class CalculateSalary extends Command
      */
     public function handle()
     {
-
+        $recaps = SalaryRecap::all();
+        foreach ($recaps as $recap) {
+            (new SalaryService())->calculateSalaryRecap($recap);
+        }
+        return $this->info("Done");
     }
 }
