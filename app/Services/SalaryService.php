@@ -66,7 +66,8 @@ class SalaryService
     public function calculateSalaryRecap(SalaryRecap $salaryRecap){
         $presence = $this->getPresenceRecords($salaryRecap);
         $salary = Salary::where('user_id',$salaryRecap->user_id)->first();
-        if($salary === null){
+        $user = User::find($salaryRecap->user_id);
+        if($salary === null || $user === null){
             return $salaryRecap;
         }
 
