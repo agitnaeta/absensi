@@ -11,6 +11,7 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -97,6 +98,11 @@ class UserCrudController extends CrudController
         CRUD::setFromDb(); // set columns from db columns.
 
         /**
+         * Filtering company id by session
+         */
+        $this->crud->addClause("where","company_id","=",Auth::guard()->user()->company_id);
+
+        /**
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
@@ -169,6 +175,15 @@ class UserCrudController extends CrudController
             ]);
 
 
+
+        CRUD::field([
+            'Label'=> "Company",
+            'name'=>'company_id',
+            'type'=>'select',
+            'model' => CompanyProfile::class,
+            'attribute'=>'name',
+            "value"=> \auth()->guard()->user()->company_id,
+        ]);
     }
 
     public function update()

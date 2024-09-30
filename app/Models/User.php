@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'schedule_id',
+        'company_id'
     ];
 
     /**
@@ -58,6 +59,10 @@ class User extends Authenticatable
 
     public function salary(){
         return $this->hasOne(Salary::class,'user_id','id');
+    }
+
+    public function company(){
+        return $this->hasOne(CompanyProfile::class,"id","company_id");
     }
 }
 
