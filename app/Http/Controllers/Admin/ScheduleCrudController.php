@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\ScheduleRequest;
+use App\Models\CompanyProfile;
 use App\Models\Day;
 use App\Models\Schedule;
 use App\Models\ScheduleDayOff;
@@ -83,6 +84,7 @@ class ScheduleCrudController extends CrudController
             'option'=>Day::all(),
             'selected'=>[],
         ]);
+
         $this->fieldModification();
     }
 
@@ -123,6 +125,14 @@ class ScheduleCrudController extends CrudController
             $this->crud->field($key)->label($value);
             $this->crud->column($key)->label($value);
         }
+        $this->crud->addField([
+            'Label'=> "Company",
+            'name'=>'company_id',
+            'type'=>'select',
+            'model' => CompanyProfile::class,
+            'attribute'=>'name',
+            "value"=> \auth()->guard()->user()->company_id,
+        ]);
         $this->crud->removeField('created_at');
         $this->crud->removeField('updated_at');
     }

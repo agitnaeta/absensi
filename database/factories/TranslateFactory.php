@@ -62,6 +62,7 @@ class TranslateFactory extends Factory
             'out' => 'Keluar',
             'over_in' => 'Lembur Masuk',
             'over_out' => 'Lembur Keluar',
+            "company_id"=>"Perushaan"
 //            'fine_per_minute' => 'Denda per Menit',
         ];
 
