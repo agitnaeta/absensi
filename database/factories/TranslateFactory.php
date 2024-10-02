@@ -84,7 +84,7 @@ class TranslateFactory extends Factory
 
     public function nationalHoliday(){
         return [
-            'date'=>'Tanggal'
+            'date'=>'Tanggal',
         ];
     }
     public function loan(){

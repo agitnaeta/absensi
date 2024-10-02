@@ -80,6 +80,7 @@ class PresenceService
     {
        $presence = new Presence();
        $presence->user_id = $user->id;
+       $presence->company_id = $user->company_id;
        $presence->in = $now->format('Y-m-d H:i:s');
        $presence->save();
        return $presence;

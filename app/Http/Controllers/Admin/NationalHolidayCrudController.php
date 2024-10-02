@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\NationalHolidayRequest;
+use App\Models\CompanyProfile;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Database\Factories\TranslateFactory;
@@ -29,6 +30,14 @@ class NationalHolidayCrudController extends CrudController
         }
         $this->crud->removeField('created_at');
         $this->crud->removeField('updated_at');
+        $this->crud->addField([
+            'Label'=> "Company",
+            'name'=>'company_id',
+            'type'=>'select',
+            'model' => CompanyProfile::class,
+            'attribute'=>'name',
+            "value"=> \auth()->guard()->user()->company_id,
+        ]);
     }
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -56,6 +65,8 @@ class NationalHolidayCrudController extends CrudController
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
+        $companyId = auth()->guard()->user()->company_id;
+        $this->crud->addClause("where","company_id",$companyId);
         $this->fieldModification();
     }
 

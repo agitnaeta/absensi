@@ -21,6 +21,7 @@ class Presence extends Model
         'lng',
         'outside',
         'extra_time',
+        "company_id"
     ];
 
     protected $guarded =[];

@@ -11,5 +11,5 @@ class NationalHoliday extends Model
     use CrudTrait;
     use HasFactory;
 
-    protected $fillable =['date','info'];
+    protected $fillable =['date','info',"company_id"];
 }

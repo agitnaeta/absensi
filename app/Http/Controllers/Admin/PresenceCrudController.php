@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\PresenceRequest;
+use App\Models\CompanyProfile;
 use App\Models\Presence;
 use App\Models\User;
 use App\Services\PresenceService;
@@ -10,6 +11,7 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Database\Factories\TranslateFactory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Prologue\Alerts\Facades\Alert;
 
 /**
@@ -76,6 +78,11 @@ class PresenceCrudController extends CrudController
          * - CRUD::column('price')->type('number');
          */
 
+        /**
+         * Filtering company id by session
+         */
+        $this->crud->addClause("where","company_id","=",Auth::guard()->user()->company_id);
+
         $this->crud->removeColumn('user_id');
         $this->crud->addColumn($this->entityField)->beforeColumn('in');
         $this->fieldModification();
@@ -99,6 +106,15 @@ class PresenceCrudController extends CrudController
                 $this->crud->removeColumn($field);
             }
         }
+
+        $this->crud->addField([
+            'Label'=> "Company",
+            'name'=>'company_id',
+            'type'=>'select',
+            'model' => CompanyProfile::class,
+            'attribute'=>'name',
+            "value"=> \auth()->guard()->user()->company_id,
+        ]);
 
 
     }

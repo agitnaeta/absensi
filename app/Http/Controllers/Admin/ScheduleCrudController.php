@@ -169,9 +169,11 @@ class ScheduleCrudController extends CrudController
     }
 
 
-    public function viewSchedule(){
-        $users = User::all();
-        $schedules = Schedule::all();
+    public function viewSchedule()
+    {
+        $companyId = auth()->user()->company_id;
+        $users = User::where("company_id",$companyId)->get();
+        $schedules = Schedule::where("company_id",$companyId)->get();
         return view('schedule.set',compact('users','schedules'));
     }
 
