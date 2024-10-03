@@ -11,6 +11,7 @@ class LoanRepository
     public static function recap()
     {
         $recap  = User::select('id', 'name')
+            ->where("company_id", auth()->user()->company_id)
             ->selectSub(function ($query) {
                 $query->selectRaw('SUM(amount)')
                     ->from('loans')

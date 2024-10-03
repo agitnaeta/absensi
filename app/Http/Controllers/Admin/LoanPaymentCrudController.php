@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\LoanPaymentRequest;
+use App\Models\CompanyProfile;
 use App\Models\LoanPayment;
 use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
@@ -40,6 +41,14 @@ class LoanPaymentCrudController extends CrudController
         }
         $this->crud->removeField('created_at');
         $this->crud->removeField('updated_at');
+        CRUD::field([
+            'Label'=> "Company",
+            'name'=>'company_id',
+            'type'=>'select',
+            'model' => CompanyProfile::class,
+            'attribute'=>'name',
+            "value"=> \auth()->guard()->user()->company_id,
+        ]);
     }
 
     /**
@@ -75,6 +84,7 @@ class LoanPaymentCrudController extends CrudController
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
+        $this->crud->addClause('where','company_id',auth()->guard()->user()->company_id);
         $this->crud->removeColumn('user_id');
         $this->crud->addColumn($this->entityField)->beforeColumn('amount');
         $this->fieldModification();

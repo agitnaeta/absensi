@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\SalaryRequest;
+use App\Models\CompanyProfile;
 use App\Models\Loan;
 use App\Models\Salary;
 use App\Models\User;
@@ -66,6 +67,7 @@ class SalaryCrudController extends CrudController
          * - CRUD::column('price')->type('number');
          */
         $this->crud->addColumn($this->entityField)->beforeColumn('amount');
+        $this->crud->addClause('where','company_id',auth()->guard()->user()->company_id);
         $this->fieldModification();
     }
 
@@ -160,6 +162,15 @@ class SalaryCrudController extends CrudController
         if($this->crud->getCurrentOperation() != 'show'){
             $this->crud->removeColumn('fine');
         }
+
+        CRUD::field([
+            'Label'=> "Company",
+            'name'=>'company_id',
+            'type'=>'select',
+            'model' => CompanyProfile::class,
+            'attribute'=>'name',
+            "value"=> \auth()->guard()->user()->company_id,
+        ]);
 
     }
 

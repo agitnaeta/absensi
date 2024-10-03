@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('national_holidays', function (Blueprint $table) {
-            $table->string("company_id")->nullable();
+        Schema::table('salary_recaps', function (Blueprint $table) {
+            $table->string('company_id')->nullable();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('national_holidays', function (Blueprint $table) {
-            $table->dropColumn("company_id");
+        Schema::table('salary_recaps', function (Blueprint $table) {
+            $table->dropColumn('company_id');
         });
     }
 };

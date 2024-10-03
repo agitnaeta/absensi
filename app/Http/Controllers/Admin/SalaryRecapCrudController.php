@@ -90,6 +90,11 @@ class SalaryRecapCrudController extends CrudController
          * - CRUD::column('price')->type('number');
          */
 
+        $this->crud->addClause(
+            "where",'company_id',
+            auth()->guard()->user()->company_id
+        );
+
 
         $this->fieldModification();
     }

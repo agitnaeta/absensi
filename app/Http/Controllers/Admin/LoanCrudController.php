@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Exports\LoanDetailExport;
 use App\Exports\LoanExport;
 use App\Http\Requests\LoanRequest;
+use App\Models\CompanyProfile;
 use App\Models\Loan;
 use App\Models\User;
 use App\Repositories\LoanRepository;
@@ -44,6 +45,16 @@ class LoanCrudController extends CrudController
         }
         $this->crud->removeField('created_at');
         $this->crud->removeField('updated_at');
+
+        CRUD::field([
+            'Label'=> "Company",
+            'name'=>'company_id',
+            'type'=>'select',
+            'model' => CompanyProfile::class,
+            'attribute'=>'name',
+            "value"=> \auth()->guard()->user()->company_id,
+        ]);
+
     }
     /**
      *
@@ -83,6 +94,7 @@ class LoanCrudController extends CrudController
         $this->crud->removeColumn('user_id');
         $this->crud->addColumn($this->entityField)->beforeColumn('amount');
         $this->fieldModification();
+        $this->crud->addClause('where','company_id',auth()->guard()->user()->company_id);
 
     }
 
