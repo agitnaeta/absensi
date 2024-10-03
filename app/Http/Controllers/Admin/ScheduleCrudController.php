@@ -38,6 +38,7 @@ class ScheduleCrudController extends CrudController
         CRUD::setModel(\App\Models\Schedule::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/schedule');
         CRUD::setEntityNameStrings('Jadwal', 'Jadwal');
+        $this->crud->addClause('with','company');
     }
 
     /**
@@ -133,6 +134,17 @@ class ScheduleCrudController extends CrudController
             'attribute'=>'name',
             "value"=> \auth()->guard()->user()->company_id,
         ]);
+
+        $this->crud->removeColumn('company_id');
+        $this->crud->column( [
+            'name' => 'company_id',
+            'label' => 'Perusahaan',
+            'type' => 'select',
+            'entity' => 'company', // the relationship method name
+            'attribute' => 'name', // the attribute to display from the related model
+            'model' => CompanyProfile::class, // the related model
+        ]);
+
         $this->crud->removeField('created_at');
         $this->crud->removeField('updated_at');
     }

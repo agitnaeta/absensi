@@ -62,7 +62,7 @@ class User extends Authenticatable
     }
 
     public function company(){
-        return $this->hasOne(CompanyProfile::class,"id","company_id");
+        return $this->belongsTo(CompanyProfile::class);
     }
 }
 

@@ -43,6 +43,7 @@ class UserCrudController extends CrudController
         CRUD::setRoute(config('backpack.base.route_prefix') . '/user');
         CRUD::setEntityNameStrings('user', 'users');
         $this->crud->addClause('with','schedule');
+        $this->crud->addClause('with','company');
     }
 
     protected function setupShowOperation()
@@ -100,7 +101,7 @@ class UserCrudController extends CrudController
         /**
          * Filtering company id by session
          */
-        $this->crud->addClause("where","company_id","=",Auth::guard()->user()->company_id);
+        $this->crud->addClause("where","company_id","=",\auth()->guard()->user()->company_id);
 
         /**
          * Columns can be defined using the fluent syntax:
@@ -115,6 +116,16 @@ class UserCrudController extends CrudController
             'entity' => 'schedule', // the relationship method name
             'attribute' => 'name', // the attribute to display from the related model
             'model' => Schedule::class, // the related model
+        ]);
+
+        $this->crud->removeColumn('company_id');
+        $this->crud->column( [
+            'name' => 'company_id',
+            'label' => 'Perusahaan',
+            'type' => 'select',
+            'entity' => 'company', // the relationship method name
+            'attribute' => 'name', // the attribute to display from the related model
+            'model' => CompanyProfile::class, // the related model
         ]);
 
         $this->crud->addButtonFromView('line','user-print','user-print','end');
@@ -167,14 +178,13 @@ class UserCrudController extends CrudController
             'model'     => Schedule::class,
             'attribute'=>'name'
         ]);
+
         CRUD::field('image')
             ->type('upload')
             ->withFiles([
                 'disk' => 'public', // the disk where file will be stored
                 'path' => 'uploads', // the path inside the disk where file will be stored
             ]);
-
-
 
         CRUD::field([
             'Label'=> "Company",

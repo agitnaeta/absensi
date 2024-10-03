@@ -16,11 +16,16 @@ class Schedule extends Model
         'out',
         'over_in',
         'over_out',
-//        'fine_per_minute',
+        'fine_per_minute',
+        'company_id'
     ];
 
     public function user()
     {
         return $this->hasMany(User::class,'schedule_id','id');
+    }
+
+    public function company(){
+        return $this->belongsTo(CompanyProfile::class);
     }
 }
