@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\LoanPaymentRequest;
 use App\Models\LoanPayment;
 use App\Models\User;
+use App\Services\Acc\Acc;
+use App\Services\Acc\AccTransaction;
 use App\Services\TransactionService;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
@@ -19,9 +21,9 @@ use Prologue\Alerts\Facades\Alert;
 class LoanPaymentCrudController extends CrudController
 {
     protected $transactionService;
-    public function __construct(TransactionService $transaction_service) {
+    public function __construct() {
         parent::__construct();
-        $this->transactionService = $transaction_service;
+        $this->transactionService = new TransactionService(new Acc(), new AccTransaction());
     }
 
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;

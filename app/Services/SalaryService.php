@@ -8,8 +8,11 @@ use App\Models\Presence;
 use App\Models\Salary;
 use App\Models\SalaryRecap;
 use App\Models\User;
+use App\Services\Acc\Acc;
+use App\Services\Acc\AccTransaction;
 use Carbon\Carbon;
 use Database\Factories\TranslateFactory;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class SalaryService
@@ -20,10 +23,10 @@ class SalaryService
 
     protected $transactionService;
 
-    public function __construct(TransactionService $transactionService)
+    public function __construct()
     {
        $this->presenceService = new PresenceService();
-       $this->transactionService = $transactionService;
+       $this->transactionService = new TransactionService(new Acc(), new AccTransaction());
 
     }
 
@@ -94,6 +97,13 @@ class SalaryService
 
         $salaryRecap->saveQuietly();
 
+
+        // only update when there's a payment
+        // avoid Issue always recall
+        if($salaryRecap->paid){
+            $this->transactionService->updateRecordSalaryToACC($salaryRecap);
+
+        }
     }
 
     public function unpaidLeaveDeduction(SalaryRecap $salaryRecap, Salary $salary){
@@ -178,14 +188,32 @@ class SalaryService
                 $loanPayment->date = $salaryRecap->updated_at;
 
                 $loanPayment->save();
-                $this->transactionService->recordPayLoanACC($loanPayment);
+
+                // only update when there's a payment
+                // avoid Issue always recall
+                if($salaryRecap->paid){
+                    $this->transactionService->updateRecordPayLoanACC($loanPayment);
+                }
             } else {
                 $existingLoanPayment->update([
                     'user_id' => $salaryRecap->user_id,
                     'amount' => $salaryRecap->loan_cut,
                     'date' => $salaryRecap->updated_at,
                 ]);
-                $this->transactionService->updateRecordPayLoanACC($existingLoanPayment);
+
+                // only update when there's a payment
+                // avoid Issue always recall
+                if($salaryRecap->paid){
+                    $this->transactionService->updateRecordPayLoanACC($existingLoanPayment);
+                }
+            }
+        }
+        else{
+            $loanPayment = LoanPayment::where("salary_recap_id",$salaryRecap->id)
+                ->first();
+            if($loanPayment){
+                $this->transactionService->deleteRecordPayLoanAcc($loanPayment);
+                $loanPayment->delete();
             }
         }
     }
@@ -217,6 +245,29 @@ class SalaryService
             return $user->salary->extra_time * $salaryRecap->extra_time;
         }
         return 0;
+    }
+
+    public function deleteWhenUncheck(SalaryRecap $salaryRecap)
+    {
+        // check if salary recap have acc id
+        if($salaryRecap->acc_id && $salaryRecap->paid == 0 )
+        {
+            // Delete loan payment related
+            $loanPayment = LoanPayment::where("salary_recap_id",$salaryRecap->id)
+                                      ->first();
+            if($loanPayment){
+                $this->transactionService->deleteRecordPayLoanAcc($loanPayment);
+                $loanPayment->delete();
+            }
+
+
+            // Delete salary recap
+            $this->transactionService->deleteRecordSalaryToACC($salaryRecap);
+
+            $salaryRecap->acc_id= NULL;
+            $salaryRecap->saveQuietly();
+
+        }
     }
 
 

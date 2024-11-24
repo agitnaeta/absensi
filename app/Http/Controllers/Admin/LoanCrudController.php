@@ -8,6 +8,8 @@ use App\Http\Requests\LoanRequest;
 use App\Models\Loan;
 use App\Models\User;
 use App\Repositories\LoanRepository;
+use App\Services\Acc\Acc;
+use App\Services\Acc\AccTransaction;
 use App\Services\TransactionService;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
@@ -25,9 +27,9 @@ class LoanCrudController extends CrudController
 {
 
     protected $transactionService;
-    public function __construct(TransactionService $transactionService) {
+    public function __construct() {
         parent::__construct();
-        $this->transactionService = $transactionService;
+        $this->transactionService = new TransactionService(new Acc(), new AccTransaction());
     }
 
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
