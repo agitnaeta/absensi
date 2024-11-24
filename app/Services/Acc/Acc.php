@@ -39,7 +39,6 @@ class Acc
             "transactions" => [$data],
         ];
 
-        Log::info(json_encode($body));
         $request = new Request('POST', $this->host.'/api/v1/transactions', $this->headers(), json_encode($body));
         $res = $client->sendAsync($request)->wait();
         return json_decode($res->getBody());
@@ -53,10 +52,6 @@ class Acc
             "fire_webhooks"=> false,
             "transactions" => [$data],
         ];
-
-        if($data->type == AccTransactionType::DEPOSIT){
-            Log::info(json_encode($body));
-        }
         $request = new Request('POST', $this->host.'/api/v1/transactions', $this->headers(), json_encode($body));
         $res = $client->sendAsync($request)->wait();
         return json_decode($res->getBody());

@@ -31,4 +31,4 @@
 
 <x-backpack::menu-item title="Profile Perusahaan" icon="la la-building" :link="backpack_url('company-profile')" />
 
-<x-backpack::menu-item title="Konfigurasi Akuntansi" icon="la la-question" :link="backpack_url('acc')" />
+<x-backpack::menu-item title="Konfigurasi Akuntansi" icon="la la-cogs" :link="backpack_url('acc')" />
