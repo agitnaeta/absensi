@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Loan;
 use App\Models\LoanPayment;
 use App\Models\SalaryRecap;
 use App\Models\User;
@@ -99,4 +100,65 @@ class TransactionService
             $this->acc->delete($data->acc_id);
         }
     }
+
+
+    /**
+     * Service For Loan
+     */
+
+
+
+    public function recordLoanACC(Loan $loan)
+    {
+        $code = "KASBON";
+        $time = Carbon::now()->format("H:i:s");
+        $user = User::find($loan->user_id);
+        $acc  = \App\Models\Acc::where("code",$code)->first();
+
+        $transaction = $this->accTransaction;
+        $transaction->type = AccTransactionType::DEPOSIT;
+        $transaction->amount = $loan->amount;
+        $transaction->date = $loan->date." ".$time;
+        $transaction->description = "$code $user->name";
+        $transaction->source_id = $acc->source_id;
+        $transaction->destination_id = $acc->destination_id;
+        $transaction->tags = $code;
+        $transaction->notes = $code;
+        $transaction->internal_reference = "ABSEN-$code-".$loan->id;
+        $transaction->external_id =$loan->id;
+        $record = $this->acc->withdraw($transaction);
+
+        // save transaction id to database
+        $loan->acc_id = $record->data->id;
+        $loan->saveQuietly();
+    }
+
+    public function updateRecordLoanACC(Loan $loan)
+    {
+        $code = "KASBON";
+        $time = Carbon::now()->format("H:i:s");
+        $user = User::find($loan->user_id);
+
+        if($loan->acc_id == null){
+            $this->recordLoanACC($loan);
+        }
+        else{
+            $transaction = $this->accTransaction;
+            $transaction->amount = $loan->amount;
+            $transaction->description = "$code $user->name";
+            $transaction->date = $loan->date." ".$time;
+            $this->acc->updateTransaction($loan->acc_id, $transaction);
+        }
+    }
+
+    public function deleteRecordLoanACC(Loan $loan)
+    {
+        if($loan->acc_id){
+            $this->acc->delete($loan->acc_id);
+        }
+    }
+
+
+
+
 }

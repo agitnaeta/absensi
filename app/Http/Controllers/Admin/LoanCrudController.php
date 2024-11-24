@@ -8,6 +8,7 @@ use App\Http\Requests\LoanRequest;
 use App\Models\Loan;
 use App\Models\User;
 use App\Repositories\LoanRepository;
+use App\Services\TransactionService;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -22,10 +23,17 @@ use Prologue\Alerts\Facades\Alert;
  */
 class LoanCrudController extends CrudController
 {
+
+    protected $transactionService;
+    public function __construct(TransactionService $transactionService) {
+        parent::__construct();
+        $this->transactionService = $transactionService;
+    }
+
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation { destroy as traitDestroy; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
     protected $entityField = [
@@ -133,6 +141,7 @@ class LoanCrudController extends CrudController
         $loan->date = $request->date;
 
         $loan->save();
+        $this->transactionService->recordLoanACC($loan);
         Alert::add('success', 'Berhasil input data')->flash();
         return redirect(route('loan.index'));
     }
@@ -146,6 +155,7 @@ class LoanCrudController extends CrudController
         $loan->date = $request->date;
 
         $loan->save();
+        $this->transactionService->updateRecordLoanACC($loan);
         Alert::add('success', 'Berhasil update data')->flash();
         return redirect(route('loan.index'));
     }
@@ -177,6 +187,15 @@ class LoanCrudController extends CrudController
         $loan  = LoanRepository::detail($user);
         $pdf = Pdf::loadView('loan.table-detail',compact('loan','user'));
         return $pdf->stream('detail.pdf');
+    }
+
+
+    public function destroy($id)
+    {
+        CRUD::hasAccessOrFail('delete');
+        $loan = Loan::find($id);
+        $this->transactionService->deleteRecordLoanACC($loan);
+        return CRUD::delete($id);
     }
 
 }
