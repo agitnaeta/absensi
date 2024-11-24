@@ -63,8 +63,8 @@ Route::group([
     Route::crud('schedule-day-off', 'ScheduleDayOffCrudController');
     Route::crud('national-holiday', 'NationalHolidayCrudController');
     Route::crud('company-profile', 'CompanyProfileCrudController');
+    Route::crud('acc', 'AccCrudController');
 }); // this should be the absolute last line of this file
-
 
 Route::get("/scan",[PresenceCrudController::class,'scan'])->name('presence.scan.public');
 Route::group(['prefix'=>'presence'],function (){

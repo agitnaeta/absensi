@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin\Operations;
 
+use App\Services\Acc\AccTransaction;
+use App\Services\SalaryService;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Illuminate\Support\Facades\Route;
 use Prologue\Alerts\Facades\Alert;
@@ -62,6 +64,9 @@ trait SetPaymentOperation
         $recap->paid = 1;
         $recap->method = $this->crud->getRequest()->get('method');
         $recap->save();
+
+        (new SalaryService())->recordSalaryToACC($recap);
+
 
         Alert::add('success', '<strong>Berhasil</strong><br>Berhasil bayar secara '.$recap->method)->flash();
         return redirect(route('salary-recap.index'));

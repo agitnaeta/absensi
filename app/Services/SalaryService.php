@@ -8,6 +8,9 @@ use App\Models\Presence;
 use App\Models\Salary;
 use App\Models\SalaryRecap;
 use App\Models\User;
+use App\Services\Acc\Acc;
+use App\Services\Acc\AccTransaction;
+use App\Services\Acc\AccTransactionType;
 use Carbon\Carbon;
 use Database\Factories\TranslateFactory;
 use Illuminate\Support\Facades\Log;
@@ -17,9 +20,16 @@ class SalaryService
 {
 
     protected $presenceService;
+
+    protected  $acc;
+
+    protected $accTransaction;
+
     public function __construct()
     {
        $this->presenceService = new PresenceService();
+       $this->acc = new Acc();
+       $this->accTransaction = new AccTransaction();
     }
 
     public function recap(Presence $presence){
@@ -182,6 +192,7 @@ class SalaryService
             }
 
 
+            $this->recordPayLoanACC($salaryRecap);
         }
     }
 
@@ -207,6 +218,46 @@ class SalaryService
             return $user->salary->extra_time * $salaryRecap->extra_time;
         }
         return 0;
+    }
+
+
+    public function recordSalaryToACC(SalaryRecap $data): void
+    {
+        $code = "GAJIAN";
+        $user = User::find($data->user_id);
+        $acc  = \App\Models\Acc::where("code",$code)->first();
+        $transaction = $this->accTransaction;
+        $transaction->type = AccTransactionType::WITHDRAWAL;
+        $transaction->amount = $data->received;
+        $transaction->date = $data->updated_at;
+        $transaction->description = "$code $user->name";
+        $transaction->source_id = $acc->source_id;
+        $transaction->destination_id = $acc->destination_id;
+        $transaction->tags = $code;
+        $transaction->notes = $data->method;
+        $transaction->internal_reference = "ABSEN-".$data->id;
+        $transaction->external_id =$data->id;
+        $this->acc->withdraw($transaction);
+    }
+
+
+    public function recordPayLoanACC(SalaryRecap $data): void
+    {
+        $code = "BAYARKASBON";
+        $user = User::find($data->user_id);
+        $acc  = \App\Models\Acc::where("code",$code)->first();
+        $transaction = $this->accTransaction;
+        $transaction->type = AccTransactionType::DEPOSIT;
+        $transaction->amount = $data->loan_cut;
+        $transaction->date = $data->updated_at;
+        $transaction->description = "$code $user->name";
+        $transaction->source_id = $acc->source_id;
+        $transaction->destination_id = $acc->destination_id;
+        $transaction->tags = $code;
+        $transaction->notes = $data->method;
+        $transaction->internal_reference = "ABSEN-".$data->id;
+        $transaction->external_id =$data->id;
+        $this->acc->deposit($transaction);
     }
 
 }
