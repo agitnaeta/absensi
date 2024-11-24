@@ -140,7 +140,7 @@ class LoanCrudController extends CrudController
     public function update()
     {
         $request = $this->crud->validateRequest();
-        $loan  = new Loan();
+        $loan  = Loan::find($request->id);
         $loan->user_id = $request->user_id;
         $loan->amount = $request->amount;
         $loan->date = $request->date;
