@@ -14,7 +14,8 @@ class Acc extends Model
     protected $fillable =[
       'code',
       'destination_id',
-      'target_id',
-      'source_id'
+      'source_id',
+      'source_name',
+      'destination_name'
     ];
 }

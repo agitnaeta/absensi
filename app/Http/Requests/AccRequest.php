@@ -25,7 +25,18 @@ class AccRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'name' => 'required|min:5|max:255'
+             'code'=>'required|unique:accs',
+             'source_id' => 'required',
+             'destination_id' => 'required'
+        ];
+    }
+
+    static function rulesUpdate($id)
+    {
+        return [
+            'code'=>'required|unique:accs,code,'.$id,
+            'source_id' => 'required',
+            'destination_id' => 'required'
         ];
     }
 

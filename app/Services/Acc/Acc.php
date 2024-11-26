@@ -68,7 +68,7 @@ class Acc
 
             $data  = [];
             foreach ($values->data as $value) {
-                $data[$value->id] = $value->attributes->name;
+                $data[$value->id] = "({$value->id}) {$value->attributes->name} - {$value->attributes->account_number} - {$value->attributes->type}";
             }
             return $data;
         }catch (\Exception $exception){

@@ -6,6 +6,8 @@ use App\Http\Requests\AccRequest;
 use App\Services\Acc\Acc;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Illuminate\Http\Request;
+use App\Models\Acc as AccModel;
 
 /**
  * Class AccCrudController
@@ -21,9 +23,9 @@ class AccCrudController extends CrudController
     }
 
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation { store as traitStore; }
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation  { update as traitUpdate;}
+    use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation ;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
     /**
@@ -46,12 +48,9 @@ class AccCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::setFromDb(); // set columns from db columns.
-
-        /**
-         * Columns can be defined using the fluent syntax:
-         * - CRUD::column('price')->type('number');
-         */
+        CRUD::column('code');
+        CRUD::column('source_name')->label('Sumber');
+        CRUD::column('destination_name')->label('Target');
     }
 
     /**
@@ -63,14 +62,14 @@ class AccCrudController extends CrudController
     protected function setupCreateOperation()
     {
         CRUD::setValidation(AccRequest::class);
-        CRUD::setFromDb(); // set fields from db columns.
 
-//        $table->string("destination_id");
-//        $table->string("destination_name");
-//        $table->string("source_id");
-//        $table->string("source_name");
+        /**
+         * Fields can be defined using the fluent syntax:
+         * - CRUD::field('price')->type('number');
+         */
 
         $account = $this->acc->getAccounts();
+        $this->crud->field('code');
         $this->crud->field(
             [
                 'name'        => 'source_id',
@@ -78,7 +77,7 @@ class AccCrudController extends CrudController
                 'type'        => 'select_from_array',
                 'required' => true,
                 'options'=>$account,
-        ]);
+            ]);
 
         $this->crud->field(
             [
@@ -88,11 +87,6 @@ class AccCrudController extends CrudController
                 'required' => true,
                 'options'=>$account,
             ]);
-
-        /**
-         * Fields can be defined using the fluent syntax:
-         * - CRUD::field('price')->type('number');
-         */
     }
 
     /**
@@ -103,6 +97,56 @@ class AccCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
-        $this->setupCreateOperation();
+
+        $accReq = $this->crud->validateRequest();
+        $this->crud->setValidation(AccRequest::rulesUpdate($accReq->get('id')));
+        $account = $this->acc->getAccounts();
+        $this->crud->field('code');
+        $this->crud->field(
+            [
+                'name'        => 'source_id',
+                'label'       => 'Sumber',
+                'type'        => 'select_from_array',
+                'required' => true,
+                'options'=>$account,
+            ]);
+
+        $this->crud->field(
+            [
+                'name'        => 'destination_id',
+                'label'       => 'Target',
+                'type'        => 'select_from_array',
+                'required' => true,
+                'options'=>$account,
+            ]);
+    }
+
+
+    public function store(Request $request)
+    {
+        $account = $this->acc->getAccounts();
+
+        $response =  $this->traitStore();
+        $acc=AccModel::get()->last();
+        $acc->source_name=$account[$request->get('source_id')];
+        $acc->destination_name=$account[$request->get('destination_id')];
+        $acc->saveQuietly();
+
+        return $response;
+    }
+
+    public function update(Request $request)
+    {
+        $response = $this->traitUpdate();
+
+        $account = $this->acc->getAccounts();
+        $acc=AccModel::findOrFail($request->id);
+        $acc->source_name=$account[$request->get('source_id')];
+        $acc->destination_name=$account[$request->get('destination_id')];
+        $acc->saveQuietly();
+
+        return $response;
+
+
     }
 }
