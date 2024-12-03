@@ -8,6 +8,8 @@ use App\Models\Presence;
 use App\Models\Salary;
 use App\Models\SalaryRecap;
 use App\Models\User;
+use App\Services\Acc\Acc;
+use App\Services\Acc\AccTransaction;
 use Carbon\Carbon;
 use Database\Factories\TranslateFactory;
 use Illuminate\Support\Facades\Log;
@@ -17,9 +19,15 @@ class SalaryService
 {
 
     protected $presenceService;
+
+
+    protected $transactionService;
+
     public function __construct()
     {
        $this->presenceService = new PresenceService();
+       $this->transactionService = new TransactionService(new Acc(), new AccTransaction());
+
     }
 
     public function recap(Presence $presence){
@@ -89,6 +97,13 @@ class SalaryService
 
         $salaryRecap->saveQuietly();
 
+
+        // only update when there's a payment
+        // avoid Issue always recall
+        if($salaryRecap->paid){
+            $this->transactionService->updateRecordSalaryToACC($salaryRecap);
+
+        }
     }
 
     public function unpaidLeaveDeduction(SalaryRecap $salaryRecap, Salary $salary){
@@ -173,21 +188,44 @@ class SalaryService
                 $loanPayment->date = $salaryRecap->updated_at;
 
                 $loanPayment->save();
+
+                // only update when there's a payment
+                // avoid Issue always recall
+                if($salaryRecap->paid){
+                    $this->transactionService->updateRecordPayLoanACC($loanPayment);
+                }
             } else {
                 $existingLoanPayment->update([
                     'user_id' => $salaryRecap->user_id,
                     'amount' => $salaryRecap->loan_cut,
                     'date' => $salaryRecap->updated_at,
                 ]);
+
+                // only update when there's a payment
+                // avoid Issue always recall
+                if($salaryRecap->paid){
+                    $this->transactionService->updateRecordPayLoanACC($existingLoanPayment);
+                }
             }
-
-
+        }
+        else{
+            $loanPayment = LoanPayment::where("salary_recap_id",$salaryRecap->id)
+                ->first();
+            if($loanPayment){
+                $this->transactionService->deleteRecordPayLoanAcc($loanPayment);
+                $loanPayment->delete();
+            }
         }
     }
 
     public function removeLoanPayment(SalaryRecap $salaryRecap){
-            LoanPayment::where('salary_recap_id',$salaryRecap->id)
-                ->first()->delete();
+            $loan = LoanPayment::where('salary_recap_id',$salaryRecap->id)
+                ->first();
+
+            $this->transactionService->deleteRecordPayLoanAcc($loan);
+            $loan->delete();
+
+
     }
 
     public function deductSalaryByLate(SalaryRecap $salaryRecap){
@@ -208,5 +246,31 @@ class SalaryService
         }
         return 0;
     }
+
+    public function deleteWhenUncheck(SalaryRecap $salaryRecap)
+    {
+        // check if salary recap have acc id
+        if($salaryRecap->acc_id && $salaryRecap->paid == 0 )
+        {
+            // Delete loan payment related
+            $loanPayment = LoanPayment::where("salary_recap_id",$salaryRecap->id)
+                                      ->first();
+            if($loanPayment){
+                $this->transactionService->deleteRecordPayLoanAcc($loanPayment);
+                $loanPayment->delete();
+            }
+
+
+            // Delete salary recap
+            $this->transactionService->deleteRecordSalaryToACC($salaryRecap);
+
+            $salaryRecap->acc_id= NULL;
+            $salaryRecap->saveQuietly();
+
+        }
+    }
+
+
+
 
 }

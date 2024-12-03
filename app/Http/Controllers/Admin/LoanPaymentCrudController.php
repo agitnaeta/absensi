@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\LoanPaymentRequest;
 use App\Models\LoanPayment;
 use App\Models\User;
+use App\Services\Acc\Acc;
+use App\Services\Acc\AccTransaction;
+use App\Services\TransactionService;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Database\Factories\TranslateFactory;
@@ -17,10 +20,16 @@ use Prologue\Alerts\Facades\Alert;
  */
 class LoanPaymentCrudController extends CrudController
 {
+    protected $transactionService;
+    public function __construct() {
+        parent::__construct();
+        $this->transactionService = new TransactionService(new Acc(), new AccTransaction());
+    }
+
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation { destroy as traitDestroy; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
     protected $entityField = [
@@ -126,6 +135,7 @@ class LoanPaymentCrudController extends CrudController
         $loan->date = $request->date;
 
         $loan->save();
+        $this->transactionService->recordPayLoanACC($loan);
         Alert::add('success', 'Berhasil input data')->flash();
         return redirect(route('loan-payment.index'));
     }
@@ -133,13 +143,24 @@ class LoanPaymentCrudController extends CrudController
     public function update()
     {
         $request = $this->crud->validateRequest();
-        $loan  = new LoanPayment();
+        $loan  = LoanPayment::find($request->id);
         $loan->user_id = $request->user_id;
         $loan->amount = $request->amount;
         $loan->date = $request->date;
 
         $loan->save();
+        $this->transactionService->updateRecordPayLoanACC($loan);
         Alert::add('success', 'Berhasil update data')->flash();
         return redirect(route('loan-payment.index'));
+    }
+
+
+
+    public function destroy($id)
+    {
+        CRUD::hasAccessOrFail('delete');
+        $loan = LoanPayment::find($id);
+        $this->transactionService->deleteRecordPayLoanAcc($loan);
+        return CRUD::delete($id);
     }
 }

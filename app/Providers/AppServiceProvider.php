@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Services\Acc\AccTransaction;
+use App\Services\SalaryService;
+use App\Services\TransactionService;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Opcodes\LogViewer\Facades\LogViewer;
@@ -13,7 +17,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-
+       $this->app->bind(TransactionService::class,App::class);
+       $this->app->bind(TransactionService::class,AccTransaction::class);
+       $this->app->bind(SalaryService::class,TransactionService::class);
     }
 
     /**

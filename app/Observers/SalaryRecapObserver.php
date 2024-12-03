@@ -28,6 +28,7 @@ class SalaryRecapObserver
     {
         $this->salaryService->calculateSalaryRecap($salaryRecap);
         $this->salaryService->payLoan($salaryRecap);
+        $this->salaryService->deleteWhenUncheck($salaryRecap);
     }
 
     /**
